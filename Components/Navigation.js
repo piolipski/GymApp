@@ -58,7 +58,7 @@ export default function Navigation({ state, descriptors, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderTopColor: 'hsla(0,0%,0%,0.35)',
+    borderTopColor: 'hsla(0,0%,0%, 0.35)',
     borderTopWidth: 1,
     justifyContent: 'space-around',
     alignItems: 'center',

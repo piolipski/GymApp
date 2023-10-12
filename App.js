@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import Navigation from './Components/Navigation/Navigation.js';
+import Navigation from './Components/Navigation.js';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import WorkoutLog from './Components/WorkoutLog.js';
@@ -9,18 +9,6 @@ import Settings from './Components/Settings.js';
 import WorkoutLogSVG from './Images/WorkoutLogSVG.svg';
 import ExerciseSVG from './Images/ExerciseSVG.svg';
 import SettingsSVG from './Images/SettingsSVG.svg';
-
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Text>Open up App.js to start working on your app!</Text>
-//       <StatusBar style="auto" />
-//       <View style={styles.navigation}>
-//         <Navigation/>
-//       </View>
-//     </View>
-//   );
-// }
 
 const WorkoutIcon = ({ focused, color, size }) => {
 
