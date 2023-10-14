@@ -5,10 +5,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import WorkoutLog from './Components/WorkoutLog.js';
 import Exercise from './Components/Exercise.js';
-import Settings from './Components/Settings.js';
+import Settings from './Components/Settings/Settings.js';
 import WorkoutLogSVG from './Images/WorkoutLogSVG.svg';
 import ExerciseSVG from './Images/ExerciseSVG.svg';
 import SettingsSVG from './Images/SettingsSVG.svg';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_700Bold
+} from '@expo-google-fonts/inter';
+import { useFonts } from 'expo-font';
 
 const WorkoutIcon = ({ focused, color, size }) => {
 
@@ -31,28 +37,36 @@ const SettingsIcon = ({ focused, color, size }) => {
 
 const Tab = createBottomTabNavigator();
 
+
 export default function App() {
+  const [loaded, error] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+  });
+
+  if (!loaded && !error) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
       <Tab.Navigator tabBar={Navigation}>
         <Tab.Screen name="WorkoutLog" component={WorkoutLog} options={{ tabBarIcon: WorkoutIcon, headerShown: false }} />
         <Tab.Screen name="Exercise" component={Exercise} options={{ tabBarIcon: ExerciseIcon, headerShown: false }} />
-        <Tab.Screen name="Settings" component={Settings} options={{ tabBarIcon: SettingsIcon, headerShown: false }} />
+        <Tab.Screen name="Settings" component={Settings} options={headerOptions} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+const headerOptions = {
+  tabBarIcon: SettingsIcon,
+  headerTitleAlign: 'center',
+  headerStyle: {
+    height: 90,
+    elevation: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: 'hsla(0, 0%, 0%, 0.35)'
   },
-  navigation: {
-    position: 'absolute',
-    bottom: 0,
-    alignItems: 'center',
-  }
-});
+}

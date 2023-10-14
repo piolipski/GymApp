@@ -1,57 +1,60 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function Navigation({ state, descriptors, navigation }) {
   return (
-    <View style={styles.container}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-              ? options.title
-              : route.name;
+    <SafeAreaView >
+      <View style={styles.container}>
 
-        const isFocused = state.index === index;
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+                ? options.title
+                : route.name;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-          });
+          const isFocused = state.index === index;
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+            });
 
-        const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key,
-          });
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        return (
-          <TouchableOpacity
-            key={index}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            style={{ flex: 1, alignItems: 'center' }}
-          >
-            <options.tabBarIcon size={35} focused={isFocused} color={isFocused ? '#006EE6' : 'hsla(0,0%,0%, 0.35)'} />
-            <Text style={{ color: isFocused ? '#006EE6' : '#222' }}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+
+          return (
+            <TouchableOpacity
+              key={index}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              onLongPress={onLongPress}
+              style={{ flex: 1, alignItems: 'center' }}
+            >
+              <options.tabBarIcon size={35} focused={isFocused} color={isFocused ? '#006EE6' : 'hsla(0,0%,0%, 0.35)'} />
+              <Text style={{ color: isFocused ? '#006EE6' : '#222' }}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -62,6 +65,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     justifyContent: 'space-around',
     alignItems: 'center',
-    padding: 15,
+    paddingBottom: Platform.OS === 'android' ? 10 : 0,
+    paddingTop: 10
   },
 });
