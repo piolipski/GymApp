@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import { View, SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function Navigation({ state, descriptors, navigation }) {
@@ -46,8 +45,8 @@ export default function Navigation({ state, descriptors, navigation }) {
               onLongPress={onLongPress}
               style={{ flex: 1, alignItems: 'center' }}
             >
-              <options.tabBarIcon size={35} focused={isFocused} color={isFocused ? '#006EE6' : 'hsla(0,0%,0%, 0.35)'} />
-              <Text style={{ color: isFocused ? '#006EE6' : '#222' }}>
+              <options.tabBarIcon size={25} focused={isFocused} color={isFocused ? '#006EE6' : 'hsla(0,0%,0%, 0.35)'} />
+              <Text style={{ color: isFocused ? '#006EE6' : 'hsla(0,0%,0%, 0.35)' }}>
                 {label}
               </Text>
             </TouchableOpacity>

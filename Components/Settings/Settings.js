@@ -1,11 +1,11 @@
-import { View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import React, { useState } from 'react';
 import { Text } from '../Text.js';
-import RightArrowSVG from '../../Images/RightArrowSVG.svg';
-
-const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+import RightArrowSVG from '../../images/RightArrowSVG.svg';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Settings() {
+    const navigation = useNavigation();
     //unit system
     const [unitSystem, setUnitSystem] = useState('kg');
     const [distanceSystem, setDistanceSystem] = useState('km');
@@ -46,13 +46,19 @@ export default function Settings() {
                 <Text style={styles.settingsCategory}>Account</Text>
                 <View style={[styles.container, { gap: 0, paddingTop: 0 }]}>
                     <View style={styles.profileButton}>
-                        <TouchableOpacity style={styles.profileTouch}>
+                        <TouchableOpacity
+                            style={styles.profileTouch}
+                            onPress={() => navigation.navigate('Login')}
+                        >
                             <Text style={styles.profileText}>Login</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.profileButton, { borderBottomWidth: 0, paddingBottom: 0 }]}>
-                        <TouchableOpacity style={styles.profileTouch}>
+                        <TouchableOpacity
+                            style={styles.profileTouch}
+                            onPress={() => navigation.navigate('Register')}
+                        >
                             <Text style={styles.profileText}>Register</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
@@ -84,7 +90,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         textAlign: 'center',
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         padding: 10,
         fontSize: 18
     },

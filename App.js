@@ -1,14 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import Navigation from './Components/Navigation.js';
+import Navigation from './components/Navigation.js';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import WorkoutLog from './Components/WorkoutLog.js';
-import Exercise from './Components/Exercise.js';
-import Settings from './Components/Settings/Settings.js';
-import WorkoutLogSVG from './Images/WorkoutLogSVG.svg';
-import ExerciseSVG from './Images/ExerciseSVG.svg';
-import SettingsSVG from './Images/SettingsSVG.svg';
+import { createStackNavigator } from '@react-navigation/stack';
+import WorkoutLog from './components/WorkoutLog.js';
+import Exercises from './components/exercises/Exercises.js';
+import Settings from './components/settings/Settings.js';
+import Login from './components/settings/profile/Login.js';
+import Register from './components/settings/profile/Register.js'
+import WorkoutLogSVG from './images/WorkoutLogSVG.svg';
+import ExerciseSVG from './images/ExerciseSVG.svg';
+import SettingsSVG from './images/SettingsSVG.svg';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -36,7 +37,17 @@ const SettingsIcon = ({ focused, color, size }) => {
 }
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
+function SettingsWrapper() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Settings" component={Settings} options={headerOptions} />
+      <Stack.Screen name="Login" component={Login} options={headerOptions} />
+      <Stack.Screen name="Register" component={Register} options={headerOptions} />
+    </Stack.Navigator>
+  )
+}
 
 export default function App() {
   const [loaded, error] = useFonts({
@@ -53,15 +64,15 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator tabBar={Navigation}>
         <Tab.Screen name="WorkoutLog" component={WorkoutLog} options={{ tabBarIcon: WorkoutIcon, headerShown: false }} />
-        <Tab.Screen name="Exercise" component={Exercise} options={{ tabBarIcon: ExerciseIcon, headerShown: false }} />
-        <Tab.Screen name="Settings" component={Settings} options={headerOptions} />
+        <Tab.Screen name="Exercises" component={Exercises} options={{ tabBarIcon: ExerciseIcon, ...headerOptions }} />
+        <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
+
 const headerOptions = {
-  tabBarIcon: SettingsIcon,
   headerTitleAlign: 'center',
   headerStyle: {
     height: 90,

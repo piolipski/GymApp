@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
-import LogoSVG from '../Images/GYMAPP.svg';
-import CalendarSVG from '../Images/CalendarSVG.svg';
-import NewWorkoutSVG from '../Images/NewWorkoutSVG.svg';
-import StartRoutineSVG from '../Images/StartRoutineSVG.svg';
-import LeftArrowSVG from '../Images/LeftArrowSVG.svg';
-import RightArrowSVG from '../Images/RightArrowSVG.svg';
+//import { Text } from './Text.js';
+import LogoSVG from '../images/GYMAPP.svg';
+import CalendarSVG from '../images/CalendarSVG.svg';
+import NewWorkoutSVG from '../images/NewWorkoutSVG.svg';
+import StartRoutineSVG from '../images/StartRoutineSVG.svg';
+import LeftArrowSVG from '../images/LeftArrowSVG.svg';
+import RightArrowSVG from '../images/RightArrowSVG.svg';
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
 
@@ -71,11 +72,11 @@ export default function WorkoutLog() {
                 <View style={{ flexDirection: 'row', gap: 15 }}>
                     <TouchableOpacity style={styles.workoutButtonContainer}>
                         <NewWorkoutSVG />
-                        <Text style={{ color: 'hsla(0,0%,0%, 0.60)' }}>Start New Workout</Text>
+                        <Text style={{ color: 'hsla(0,0%,0%, 0.60)', paddingTop: 5 }}>Start New Workout</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.workoutButtonContainer}>
                         <StartRoutineSVG />
-                        <Text style={{ color: 'hsla(0,0%,0%, 0.60)' }}>From Routine</Text>
+                        <Text style={{ color: 'hsla(0,0%,0%, 0.60)', paddingTop: 5 }}>From Routine</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     dateText: {
       fontSize: 40,
       color: '#006EE6',
-      fontWeight: 'bold',
+      fontFamily: 'Inter_700Bold',
     },
     calendarContainer: {
       marginTop: 50,

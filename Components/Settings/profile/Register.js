@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+//import { Text } from '../Text.js';
 
-
-export default function Exercise(){
+export default function Register() {
 
     return(
         <View>
-            <Text>cos2</Text>
+            <Text>cos3</Text>
         </View>
     )
 }
