@@ -69,15 +69,13 @@ export const getAllExercises = async () => {
         keys = await AsyncStorage.getAllKeys();
 
         for (const key of keys) {
-            for (const keyPart of key) {
-                if (keyPart.includes('exercise')) {
-                    try {
-                        const jsonValue = await AsyncStorage.getItem(keyPart);
-                        values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
-                    } catch (error) {
-                        console.error('Error retrieving data: ', error);
-                        return null;
-                    }
+            if (key.includes('exercise')) {
+                try {
+                    const jsonValue = await AsyncStorage.getItem(key);
+                    values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
+                } catch (error) {
+                    console.error('Error retrieving data: ', error);
+                    return null;
                 }
             }
         }
@@ -97,15 +95,13 @@ export const getAllTrainings = async () => {
         keys = await AsyncStorage.getAllKeys();
 
         for (const key of keys) {
-            for (const keyPart of key) {
-                if (keyPart.includes('training')) {
-                    try {
-                        const jsonValue = await AsyncStorage.getItem(keyPart);
-                        values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
-                    } catch (error) {
-                        console.error('Error retrieving data: ', error);
-                        return null;
-                    }
+            if (key.includes('training')) {
+                try {
+                    const jsonValue = await AsyncStorage.getItem(key);
+                    values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
+                } catch (error) {
+                    console.error('Error retrieving data: ', error);
+                    return null;
                 }
             }
         }
