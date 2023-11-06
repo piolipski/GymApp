@@ -1,14 +1,26 @@
-import { View, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import {
+    View,
+    ScrollView,
+    TouchableOpacity,
+    StyleSheet,
+    StatusBar,
+    Platform,
+    SafeAreaView,
+    Modal,
+    Pressable,
+} from 'react-native';
 import React, { useState } from 'react';
 import { Text } from '../Text.js';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
-import { useNavigation } from '@react-navigation/native';
+import Alarm from '../Alarm/Alarm.js';
+
+const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 export default function Settings() {
-    const navigation = useNavigation();
     //unit system
     const [unitSystem, setUnitSystem] = useState('kg');
     const [distanceSystem, setDistanceSystem] = useState('km');
+    const [modalVisible, setModalVisible] = useState(false);
 
     const setKg = () => { setUnitSystem('kg'); }
     const setLbs = () => { setUnitSystem('lbs'); }
@@ -20,6 +32,8 @@ export default function Settings() {
 
     const setDarkModeOn = () => { setDarkMode(true); }
     const setDarkModeOff = () => { setDarkMode(false); }
+
+
 
     return (
         <SafeAreaView style={styles.safeAreaView}>
@@ -46,19 +60,13 @@ export default function Settings() {
                 <Text style={styles.settingsCategory}>Account</Text>
                 <View style={[styles.container, { gap: 0, paddingTop: 0 }]}>
                     <View style={styles.profileButton}>
-                        <TouchableOpacity
-                            style={styles.profileTouch}
-                            onPress={() => navigation.navigate('Login')}
-                        >
+                        <TouchableOpacity style={styles.profileTouch}>
                             <Text style={styles.profileText}>Login</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.profileButton, { borderBottomWidth: 0, paddingBottom: 0 }]}>
-                        <TouchableOpacity
-                            style={styles.profileTouch}
-                            onPress={() => navigation.navigate('Register')}
-                        >
+                        <TouchableOpacity style={styles.profileTouch}>
                             <Text style={styles.profileText}>Register</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
@@ -67,6 +75,24 @@ export default function Settings() {
                 <Text style={styles.settingsCategory}>Application settings</Text>
                 <View style={styles.container}>
                 </View>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        setModalVisible(!modalVisible);
+                    }}>
+                    <Pressable 
+                    style={styles.modalContainer} 
+                    onPress={(event) => event.currentTarget===event.target && setModalVisible(false)}>
+                        <Alarm />
+                    </Pressable>
+                </Modal>
+                <TouchableOpacity
+                    style={[styles.button, styles.buttonOpen]}
+                    onPress={() => setModalVisible(true)}>
+                    <Text style={styles.textStyle}>Show Modal</Text>
+                </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
     );
@@ -90,7 +116,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         textAlign: 'center',
-        fontFamily: 'Inter_700Bold',
+        fontWeight: 'bold',
         padding: 10,
         fontSize: 18
     },
@@ -122,4 +148,10 @@ const styles = StyleSheet.create({
     profileText: {
         fontSize: 16,
     },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    }
 });

@@ -16,6 +16,8 @@ import {
   Inter_700Bold
 } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
+import Alarm from './components/Alarm/Alarm.js';
+import { AlarmContextProvider, AlarmContext } from './components/Alarm/AlarmContext.js';
 
 const WorkoutIcon = ({ focused, color, size }) => {
 
@@ -61,13 +63,15 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator tabBar={Navigation}>
-        <Tab.Screen name="WorkoutLog" component={WorkoutLog} options={{ tabBarIcon: WorkoutIcon, headerShown: false }} />
-        <Tab.Screen name="Exercises" component={Exercises} options={{ tabBarIcon: ExerciseIcon, ...headerOptions }} />
-        <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <AlarmContextProvider>
+      <NavigationContainer>
+        <Tab.Navigator tabBar={Navigation}>
+          <Tab.Screen name="WorkoutLog" component={WorkoutLog} options={{ tabBarIcon: WorkoutIcon, headerShown: false }} />
+          <Tab.Screen name="Exercises" component={Exercises} options={{ tabBarIcon: ExerciseIcon, ...headerOptions }} />
+          <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </AlarmContextProvider>
   );
 }
 
