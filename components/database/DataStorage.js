@@ -64,15 +64,14 @@ export const editItem = async (key, data) => {
 
 export const getAllExercises = async () => {
     try {
-        let keys = [];
+        let keys = await AsyncStorage.getAllKeys();
         let values = [];
-        keys = await AsyncStorage.getAllKeys();
-
+        
         for (const key of keys) {
             if (key.includes('exercise')) {
                 try {
                     const jsonValue = await AsyncStorage.getItem(key);
-                    values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
+                    values.push(jsonValue != null ? JSON.parse(jsonValue) : null);
                 } catch (error) {
                     console.error('Error retrieving data: ', error);
                     return null;
