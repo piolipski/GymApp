@@ -16,8 +16,7 @@ import {
   Inter_700Bold
 } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
-import Alarm from './components/Alarm/Alarm.js';
-import { AlarmContextProvider, AlarmContext } from './components/Alarm/AlarmContext.js';
+import { AlarmContextProvider} from './components/Alarm/AlarmContext.js';
 
 const WorkoutIcon = ({ focused, color, size }) => {
 

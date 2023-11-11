@@ -72,7 +72,7 @@ export const getAllExercises = async () => {
             if (key.includes('exercise')) {
                 try {
                     const jsonValue = await AsyncStorage.getItem(key);
-                    values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
+                    values.push(jsonValue != null ? JSON.parse(jsonValue) : null);
                 } catch (error) {
                     console.error('Error retrieving data: ', error);
                     return null;
@@ -98,7 +98,7 @@ export const getAllTrainings = async () => {
             if (key.includes('training')) {
                 try {
                     const jsonValue = await AsyncStorage.getItem(key);
-                    values.join(jsonValue != null ? JSON.parse(jsonValue) : null);
+                    values.push(jsonValue != null ? JSON.parse(jsonValue) : null);
                 } catch (error) {
                     console.error('Error retrieving data: ', error);
                     return null;
@@ -113,3 +113,23 @@ export const getAllTrainings = async () => {
         return null;
     }
 };
+
+
+const checkFirstTimeOpening = async () => {
+    try {
+        const isFirstTimeOpened = await getItem(['key','isFirstTimeOpened']);
+
+        if (!isFirstTimeOpened) {
+            await addItem(['key','vibration'],false);
+            await addItem(['key','sound'],true);
+            await addItem(['key','autoStart'],false);
+            console.log('test',await getItem(['key','vibration']),await getItem(['key','sound']),await getItem(['key','autoStart']))
+
+            await addItem(['key', 'isFirstTimeOpened'], true);
+        }
+    } catch (error) {
+        console.error('Error checking first time opening: ', error);
+    }
+};
+
+checkFirstTimeOpening();

@@ -2,87 +2,89 @@
 import {
     Platform,
     Text,
-    Vibration,
     View,
     SafeAreaView,
     StyleSheet,
     TouchableOpacity,
     TextInput,
+    Alert
 } from 'react-native';
 import CheckBox from '../CheckBox';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useAlarm } from './AlarmContext';
+import { editItem, getItem } from '../database/DataStorage';
 
 export default function Alarm() {
 
-    const [status, setStatus] = useState('stopped');
-    const [vibration, setVibration] = useState(true);
-    const [autoStart, setAutoStart] = useState(true);
-    const [timeAmount, setTimeAmount] = useState('5');
     const alarm = useAlarm();
+    // const [vibration, setVibration] = useState(null);
+    // const [sound, setSound] = useState(null);
+    // const [autoStart, setAutoStart] = useState(null);
+    const timeAmount = alarm.seconds.toString();
 
-    const ONE_SECOND_IN_MS = 1000;
-
-    const onTimeAmountChange = (text) => {
-        setTimeAmount(text.replace(/[,.\-\s]/, ''))
+    const vibrationChange = async () => {
+        const boolean = !alarm.vibration;
+        alarm.setVibration(boolean);
+        await editItem(['key', 'vibration'], boolean);
+    }
+    const soundChange = async () => {
+        const boolean = !alarm.sound;
+        alarm.setSound(boolean);
+        await editItem(['key', 'sound'], boolean);
+    }
+    const autoStartChange = async () => {
+        const boolean = !alarm.autoStart;
+        alarm.setAutoStart(boolean);
+        await editItem(['key', 'autoStart'], boolean);
     }
 
     const increaseAmount = () => {
-        const timeInt = Number(timeAmount) + 10;
-        const timeString = timeInt.toString()
-        setTimeAmount(timeString)
-    };
-
-    const decreaseAmount = () => {
-        const timeInt = Number(timeAmount) - 10;
-        if (timeInt < 0) {
-            const zero = 0;
-            setTimeAmount(zero.toString());
+        alarm.stop();
+        const increasedSeconds = alarm.seconds + 10;
+        if (increasedSeconds > 999) {
+            alarm.setSeconds(999);
         } else {
-            const timeString = timeInt.toString();
-            setTimeAmount(timeString);
+            alarm.setSeconds(increasedSeconds);
         }
     };
 
-    const startTimer = () => {
-        alarm.start(Number(timeAmount));
+    const decreaseAmount = () => {
+        alarm.stop();
+        const decreasedSeconds = alarm.seconds - 10;
+        if (decreasedSeconds < 0) {
+            alarm.setSeconds(0);
+        } else {
+            alarm.setSeconds(decreasedSeconds);
+        }
+    };
+
+    // useEffect(() => {
+    //    async function fetchLocalData(){
+    //         const vibrationBoolean = await getItem(['key', 'vibration']);
+    //         const soundBoolean = await getItem(['key', 'sound']);
+    //         const autoStartBoolean = await getItem(['key', 'autoStart']);
+    //         setVibration(vibrationBoolean);
+    //         setSound(soundBoolean);
+    //         setAutoStart(autoStartBoolean);
+    //     };
+    //     fetchLocalData();
         
-        // const timeInSeconds = Number(timeAmount);
-        // remainingTime = timeInSeconds;
-        // setStatus('running');
-    }
+    // }, []);
+
+    const startTimer = () => {
+        if (timeAmount === '0') {
+            Alert.alert('', 'Please enter duration for the timer', [
+                { text: 'OK' },
+            ]);
+        } else {
+            alarm.start(Number(timeAmount));
+        }
+    };
 
     const stopTimer = () => {
         remainingTime = null;
-        setStatus('stopped');
+        alarm.stop();
     }
-
-    // useEffect(() => {
-
-    //     const numToString = (number) =>{
-    //         return number.toString()
-    //     }
-
-    //     if (status === 'running' && remainingTime > 0) {
-    //         const timer = setInterval(() => {
-    //             remainingTime = remainingTime - 1;
-    //             setTimeAmount((prevTime) => numToString(prevTime - 1));
-    //         }, ONE_SECOND_IN_MS);
-
-    //         return () => {
-    //             clearInterval(timer);
-    //             if (vibration) {
-    //                 Vibration.vibrate(PATTERN, true);
-    //             }
-    //         };
-    //     } else if (status === 'running' && remainingTime === 0) {
-    //         remainingTime = null;
-    //         setStatus('stopped');
-    //         if (vibration) {
-    //             Vibration.vibrate(PATTERN, true);
-    //         }
-    //     }
-    // }, [status, remainingTime, vibration])
 
     return (
         <SafeAreaView style={styles.centeredView}>
@@ -101,7 +103,7 @@ export default function Alarm() {
                     </TouchableOpacity>
                     <TextInput
                         style={styles.inputContainer}
-                        onChangeText={(text) => onTimeAmountChange(text)}
+                        onChangeText={(text) => alarm.onSecondsChange(text)}
                         value={timeAmount}
                         keyboardType='numeric'
                         maxLength={3}
@@ -117,24 +119,29 @@ export default function Alarm() {
                 </View>
                 <View style={styles.checkBoxContainer}>
                     <CheckBox
-                        onPress={() => setVibration(!vibration)}
+                        onPress={vibrationChange}
                         title="Vibration"
-                        isChecked={vibration}
+                        isChecked={alarm.vibration}
                     />
                     <CheckBox
-                        onPress={() => setAutoStart(!autoStart)}
+                        onPress={soundChange}
+                        title="Sound"
+                        isChecked={alarm.sound}
+                    />
+                    <CheckBox
+                        onPress={autoStartChange}
                         title="Auto start"
-                        isChecked={autoStart}
+                        isChecked={alarm.autoStart}
                     />
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center', padding: 10 }}>
-                    {status === 'stopped' ? (
+                    {alarm.status === 'stopped' ? (
                         <TouchableOpacity style={styles.startButtonContainer} onPress={startTimer}>
                             <Text style={styles.startTextContainer}>
                                 Start
                             </Text>
                         </TouchableOpacity>
-                    ): (
+                    ) : (
                         <TouchableOpacity style={styles.startButtonContainer} onPress={stopTimer}>
                             <Text style={styles.startTextContainer}>
                                 Stop
