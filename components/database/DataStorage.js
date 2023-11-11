@@ -64,10 +64,9 @@ export const editItem = async (key, data) => {
 
 export const getAllExercises = async () => {
     try {
-        let keys = [];
+        let keys = await AsyncStorage.getAllKeys();
         let values = [];
-        keys = await AsyncStorage.getAllKeys();
-
+        
         for (const key of keys) {
             if (key.includes('exercise')) {
                 try {
