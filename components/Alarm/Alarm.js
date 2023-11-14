@@ -1,7 +1,5 @@
-
 import {
     Platform,
-    Text,
     View,
     SafeAreaView,
     StyleSheet,
@@ -10,9 +8,9 @@ import {
     Alert
 } from 'react-native';
 import CheckBox from '../CheckBox';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { Text } from '../Text.js';
 import { useAlarm } from './AlarmContext';
-import { editItem, getItem } from '../database/DataStorage';
+import { setItem, getItem } from '../database/DataStorage';
 
 export default function Alarm() {
 
@@ -25,17 +23,17 @@ export default function Alarm() {
     const vibrationChange = async () => {
         const boolean = !alarm.vibration;
         alarm.setVibration(boolean);
-        await editItem(['key', 'vibration'], boolean);
+        await setItem(['key', 'vibration'], boolean);
     }
     const soundChange = async () => {
         const boolean = !alarm.sound;
         alarm.setSound(boolean);
-        await editItem(['key', 'sound'], boolean);
+        await setItem(['key', 'sound'], boolean);
     }
     const autoStartChange = async () => {
         const boolean = !alarm.autoStart;
         alarm.setAutoStart(boolean);
-        await editItem(['key', 'autoStart'], boolean);
+        await setItem(['key', 'autoStart'], boolean);
     }
 
     const increaseAmount = () => {

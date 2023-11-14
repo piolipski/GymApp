@@ -1,17 +1,19 @@
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
-//import { Text } from './Text.js';
-import LogoSVG from '../images/GYMAPP.svg';
-import CalendarSVG from '../images/CalendarSVG.svg';
-import NewWorkoutSVG from '../images/NewWorkoutSVG.svg';
-import StartRoutineSVG from '../images/StartRoutineSVG.svg';
-import LeftArrowSVG from '../images/LeftArrowSVG.svg';
-import RightArrowSVG from '../images/RightArrowSVG.svg';
+import { View, TouchableOpacity, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
+import { Text } from '../Text.js';
+
+import LogoSVG from '../../images/GYMAPP.svg';
+import CalendarSVG from '../../images/CalendarSVG.svg';
+import NewWorkoutSVG from '../../images/NewWorkoutSVG.svg';
+import StartRoutineSVG from '../../images/StartRoutineSVG.svg';
+import LeftArrowSVG from '../../images/LeftArrowSVG.svg';
+import RightArrowSVG from '../../images/RightArrowSVG.svg';
+
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
 
 const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
-export default function WorkoutLog() {
+export default function WorkoutLog({ navigation }) {
 
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -40,11 +42,15 @@ export default function WorkoutLog() {
         }
     }
 
+    const handleStartNewWorkoutButton = () => {
+        navigation.navigate('ExercisesTab');
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.logoContainer}>
+            {/* <View style={styles.logoContainer}>
                 <LogoSVG height={63} width={231} />
-            </View>
+            </View> */}
             <View style={styles.dateContainer}>
                 <TouchableOpacity style={[styles.arrowContainer, styles.leftArrowContainer]} onPress={handleGoToYesterday}>
                     <LeftArrowSVG height={13} width={13} />
@@ -56,7 +62,7 @@ export default function WorkoutLog() {
                     <RightArrowSVG height={13} width={13} />
                 </TouchableOpacity>
             </View>
-            <View style={styles.calendarContainer}>
+            {/* <View style={styles.calendarContainer}>
                 <Text style={{ fontSize: 16 }}>
                     Calendar
                 </Text>
@@ -64,13 +70,13 @@ export default function WorkoutLog() {
                     <Text style={{ flexGrow: 1, color: 'hsla(0,0%,0%, 0.60)' }}>Open calendar view</Text>
                     <CalendarSVG height={21} width={19} color='#006EE6' />
                 </TouchableOpacity>
-            </View>
+            </View> */}
             <View style={styles.workoutContainer}>
                 <Text style={{ fontSize: 16 }}>
                     Workout
                 </Text>
                 <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <TouchableOpacity style={styles.workoutButtonContainer}>
+                    <TouchableOpacity style={styles.workoutButtonContainer} onPress={handleStartNewWorkoutButton}>
                         <NewWorkoutSVG />
                         <Text style={{ color: 'hsla(0,0%,0%, 0.60)', paddingTop: 5 }}>Start New Workout</Text>
                     </TouchableOpacity>

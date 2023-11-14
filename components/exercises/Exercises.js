@@ -1,30 +1,52 @@
 import { TextInput, View, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
 import SearchSVG from '../../images/SearchSVG.svg';
 import { Text } from '../Text.js';
+import  ExerciseForm  from './ExerciseForm.js';
 import { useState, useEffect } from 'react';
 import { getAllExercises } from '../database/DataStorage.js';
 import { useIsFocused } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-export default function Exercises() {
+export default function Exercises({navigation}) {
+
     const isFocused = useIsFocused();
 
     const [searchText, setSearchText] = useState('');
     const [exercises, setExercises] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedExercises, setSelectedExercises] = useState([]);
+    const [filter, setFilter] = useState(false);
 
     useEffect(() => {
         if (isFocused) {
             fetchExercises();
+        } else{
+            setSelectedExercises([]);
+            setFilter(false);
         }
     }, [isFocused]);
 
     const fetchExercises = async () => {
         const exerciseData = await getAllExercises();
+        const categoriesData = exerciseData.map(exercise => { return exercise.category });
+        const filteredCategories = categoriesData.filter((item, index) => categoriesData.indexOf(item) === index)
+        setCategories(filteredCategories);
         setExercises(exerciseData || []);
+    };
+
+    const handleCategoryButton = (e) => {
+        const filterdArray = exercises.filter((exercise) => exercise.category === e);
+        setSelectedExercises(filterdArray.sort());
+        setFilter(true);
     };
 
     const filteredExercises = exercises.filter(exercise => {
         return exercise.name.includes(searchText);
     });
+
+    const handleChosenExerciseButton = (name) => {
+        navigation.navigate('ExerciseForm', {key1: name});
+    }
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -39,13 +61,24 @@ export default function Exercises() {
             </View>
             <View style={{ flex: 1 }}>
                 <ScrollView style={styles.scrollView}>
-                    {filteredExercises.map((exercise, index) => (
-                        <View style={styles.exerciseItem} key={index}>
-                            <Text style={styles.exerciseName}>{exercise.name}</Text>
-                            <Text style={styles.exerciseCategory}>{exercise.category}</Text>
-                            <Text style={styles.exerciseDescription}>{exercise.description}</Text>
-                        </View>
-                    ))}
+                    {filter ? (
+                        selectedExercises.map((exercise, index) => (
+                            <View style={styles.exerciseItem} key={index}>
+                                <TouchableOpacity onPress={() => {handleChosenExerciseButton(exercise.name)}}>
+                                <Text style={styles.exerciseName}>{exercise.name}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))
+                    ) : (
+                        categories.map((category, index) => (
+                            <View style={styles.exerciseItem} key={index}>
+                                <TouchableOpacity onPress={() => {handleCategoryButton(category)}}>
+                                    <Text style={styles.exerciseName}>{category}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))
+                    )}
+
                 </ScrollView>
             </View>
         </SafeAreaView>

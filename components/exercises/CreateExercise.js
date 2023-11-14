@@ -2,7 +2,7 @@ import { View, StyleSheet, SafeAreaView, TextInput, TouchableOpacity } from 'rea
 import { Text } from '../Text.js';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
 import { useState } from 'react';
-import { addItem } from '../database/DataStorage.js';
+import { setItem } from '../database/DataStorage.js';
 
 export default function CreateExercise({ navigation }) {
     const [exerciseName, setExerciseName] = useState('');
@@ -26,7 +26,7 @@ export default function CreateExercise({ navigation }) {
             description: exerciseDescription
         };
 
-        await addItem(['exercise', exerciseName], exerciseData);
+        await setItem(['exercise', exerciseName], exerciseData);
         navigation.navigate('Exercises');
     };
 

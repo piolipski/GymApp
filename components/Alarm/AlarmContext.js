@@ -15,13 +15,11 @@ export const AlarmContextProvider = ({ children }) => {
   const [autoStart, setAutoStart] = useState(null);
   const notificationId = useRef(null);
 
-  // Notifications.setNotificationHandler({
-  //   handleNotification: async () => ({
-  //     shouldShowAlert: true,
-  //     shouldPlaySound: true,
-  //     shouldSetBadge: false,
-  //   }),
-  // });
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: false,
+    }),
+  });
 
   const onSecondsChange = (text) => {
     const stringSeconds = text.replace(/[,.\-\s]/, '');
@@ -32,12 +30,21 @@ export const AlarmContextProvider = ({ children }) => {
     setStatus('running');
     const targetTime = Date.now() + initialSeconds * ONE_SECOND_IN_MS;
 
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
     const newNotificationId = await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Timer Finished',
         body: 'Your timer has finished!',
-        sound: sound,
-        vibrate: vibration,
+        sound: false,
+        vibrate: false,
       },
       trigger: { date: new Date(targetTime) },
     });

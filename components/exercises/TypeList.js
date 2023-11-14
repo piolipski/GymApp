@@ -3,7 +3,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Text } from '../Text.js';
 
 export default function TypeList({ route, navigation }) {
-    const { onTypeSelected, selectedType } = route.params;
+    const { onTypeSelected, selectedType } = route?.params;
 
     const data = [
         {

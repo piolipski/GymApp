@@ -3,7 +3,7 @@ import { Text } from '../Text.js';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function CategoryList({ route, navigation }) {
-    const { onCategorySelected, selectedCategory } = route.params;
+    const { onCategorySelected, selectedCategory } = route?.params;
 
     const data = [
         {

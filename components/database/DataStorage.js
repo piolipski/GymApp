@@ -10,7 +10,7 @@ export const validateKey = (key) => {
     }
 };
 
-export const addItem = async (key, data) => {
+export const setItem = async (key, data) => {
     validateKey(key);
 
     try {
@@ -49,18 +49,6 @@ export const deleteItems = async (key) => {
         console.error('Error clearing data: ', error);
     }
 };
-
-export const editItem = async (key, data) => {
-    validateKey(key);
-    try {
-        await AsyncStorage.removeItem(key.join(SEP));
-        const jsonValue = JSON.stringify(data);
-        await AsyncStorage.setItem(key.join(SEP), jsonValue);
-
-    } catch (error) {
-        console.error('Error editing data: ', error);
-    }
-}
 
 export const getAllExercises = async () => {
     try {
@@ -119,12 +107,12 @@ const checkFirstTimeOpening = async () => {
         const isFirstTimeOpened = await getItem(['key','isFirstTimeOpened']);
 
         if (!isFirstTimeOpened) {
-            await addItem(['key','vibration'],false);
-            await addItem(['key','sound'],true);
-            await addItem(['key','autoStart'],false);
+            await setItem(['key','vibration'],false);
+            await setItem(['key','sound'],true);
+            await setItem(['key','autoStart'],false);
             console.log('test',await getItem(['key','vibration']),await getItem(['key','sound']),await getItem(['key','autoStart']))
 
-            await addItem(['key', 'isFirstTimeOpened'], true);
+            await setItem(['key', 'isFirstTimeOpened'], true);
         }
     } catch (error) {
         console.error('Error checking first time opening: ', error);
