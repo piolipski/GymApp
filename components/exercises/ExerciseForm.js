@@ -21,7 +21,7 @@ export default function ExerciseForm() {
     const exerciseName = route.params.key1;
 
     const selectedSeriesId = useRef(null);
-    
+
     const [todaySelected, setTodaySelected] = useState(true)
     const [editMode, setEditMode] = useState(false);
     const [trackContent, setTrackContent] = useState('today');
@@ -384,13 +384,15 @@ export default function ExerciseForm() {
                     <View style={styles.typeTextContainer}>
                         <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type1}</Text>
                     </View>
-                    <TextInput
-                        style={styles.inputTimeContainer}
-                        onChangeText={onDistaneChange}
-                        value={typeValue.type2}
-                        keyboardType='numeric'
-                        maxLength={4}
-                    />
+                    <View style={{ justifyContent: 'center', alignItems: 'center', }}>
+                        <TextInput
+                            style={styles.inputTimeContainer}
+                            onChangeText={onDistaneChange}
+                            value={typeValue.type2}
+                            keyboardType='numeric'
+                            maxLength={4}
+                        />
+                    </View>
                     <View style={styles.typeTextContainer}>
                         <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type2}</Text>
                     </View>
@@ -410,7 +412,7 @@ export default function ExerciseForm() {
             const fetchedHistoryData = await getItem(['workout', exerciseName]);
             const fetchedType = fetchedExerciseData.type.split(' - ');
             const existingExercise = fetchedWorkoutData?.[exerciseName]?.series;
-
+            
             if (fetchedHistoryData) {
                 const sortedData = Object.entries(fetchedHistoryData)
                     .sort((a, b) => new Date(b[0]) - new Date(a[0]))

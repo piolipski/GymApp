@@ -113,13 +113,11 @@ function WorkoutsWrapper() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="WorkoutLog" component={WorkoutLog} options={{
-        ...headerOptions, title: "Workout Log", headerRight: () => (
-          <TouchableOpacity onPress={() => navigation.navigate('CalendarView')} style={{ paddingRight: 25, justifyContent: 'center' }}>
-            <Text style={{ color: '#006EE6', fontSize: 30 }}>+</Text>
-          </TouchableOpacity>
-        )
+        ...headerOptions, title: "Workout Log"
       }} />
+      <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
       <Stack.Screen name="CalendarView" component={Calendar} options={{ tabBarIcon: CalendarIcon, title: "Calendar" }} />
+    
     </Stack.Navigator>
   )
 }
