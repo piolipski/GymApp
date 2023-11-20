@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text } from './components/Text.js';
 import { useFonts } from 'expo-font';
+import { useState } from 'react';
 import { AlarmContextProvider } from './components/alarm/AlarmContext.js';
 import { DateContextProvider } from './components/date/DateContext.js';
 
@@ -20,7 +21,7 @@ import Register from './components/settings/profile/Register.js'
 
 import CreateExercise from './components/exercises/CreateExercise.js';
 import ExerciseForm from './components/exercises/ExerciseForm.js';
-import CategoryList from './components/exercises/CategoryList.js';
+import CategoryList from './components/exercises/category/CategoryList.js';
 import TypeList from './components/exercises/TypeList.js';
 
 import FeedSVG from './images/FeedSVG.svg';
@@ -99,10 +100,20 @@ function ExercisesWrapper() {
 }
 
 function CreateExerciseWrapper() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <Stack.Navigator>
       <Stack.Screen name="CreateExercise" component={CreateExercise} options={{ ...headerOptions, title: "Create Exercise" }} />
-      <Stack.Screen name="CategoryList" component={CategoryList} options={{ ...headerOptions, title: "Categories" }} />
+      <Stack.Screen name="CategoryList" options={{
+        ...headerOptions, title: "Categories", headerRight: () => (
+          <TouchableOpacity onPress={() => { setModalOpen(true) }}>
+            <Text style={{ fontSize: 16, marginRight: 15, color: '#006EE6' }}>Create</Text>
+          </TouchableOpacity>
+        ),
+      }}>
+        {(props) => <CategoryList {...props} modalOpen={modalOpen} setModalOpen={setModalOpen} />}
+      </Stack.Screen>
       <Stack.Screen name="TypeList" component={TypeList} options={{ ...headerOptions, title: "Types" }} />
     </Stack.Navigator>
   )
