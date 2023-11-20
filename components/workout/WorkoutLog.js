@@ -7,6 +7,7 @@ import NewWorkoutSVG from '../../images/NewWorkoutSVG.svg';
 import StartRoutineSVG from '../../images/StartRoutineSVG.svg';
 import LeftArrowSVG from '../../images/LeftArrowSVG.svg';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
+import { useDate } from '../date/DateContext.js';
 
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
@@ -15,32 +16,7 @@ const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 export default function WorkoutLog({ navigation }) {
 
-    const [currentDate, setCurrentDate] = useState(new Date());
-
-    const handleGoToYesterday = () => {
-        setCurrentDate((prevDate) => subDays(prevDate, 1));
-    };
-
-    const handleGoToTomorrow = () => {
-        setCurrentDate((prevDate) => addDays(prevDate, 1));
-    };
-
-    const whatDay = () => {
-
-        const today = new Date();
-        const yesterday = subDays(today, 1);
-        const tomorrow = addDays(today, 1);
-
-        if(format(currentDate, 'dd/MM/yyyy') === format(today, 'dd/MM/yyyy')){
-            return 'Today';
-        } else if (format(currentDate, 'dd/MM/yyyy') === format(yesterday, 'dd/MM/yyyy')){
-            return 'Yesterday';
-        } else if (format(currentDate, 'dd/MM/yyyy') === format(tomorrow, 'dd/MM/yyyy')){
-            return 'Tomorrow';
-        } else {
-            return format(currentDate, 'dd/MM/yyyy');
-        }
-    }
+    const date = useDate();
 
     const handleStartNewWorkoutButton = () => {
         navigation.navigate('ExercisesTab');
@@ -52,13 +28,13 @@ export default function WorkoutLog({ navigation }) {
                 <LogoSVG height={63} width={231} />
             </View> */}
             <View style={styles.dateContainer}>
-                <TouchableOpacity style={[styles.arrowContainer, styles.leftArrowContainer]} onPress={handleGoToYesterday}>
+                <TouchableOpacity style={[styles.arrowContainer, styles.leftArrowContainer]} onPress={date.handleGoToYesterday}>
                     <LeftArrowSVG height={13} width={13} />
                 </TouchableOpacity>
                 <Text style={styles.dateText}>
-                    {whatDay()}
+                    {date.whatDay()}
                 </Text>
-                <TouchableOpacity style={[styles.arrowContainer, styles.rightArrowContainer]} onPress={handleGoToTomorrow}>
+                <TouchableOpacity style={[styles.arrowContainer, styles.rightArrowContainer]} onPress={date.handleGoToTomorrow}>
                     <RightArrowSVG height={13} width={13} />
                 </TouchableOpacity>
             </View>

@@ -8,7 +8,7 @@ export default function TypeList({ route, navigation }) {
     const data = [
         {
             key: "type",
-            values: ["kg - rep", "time - km", "kg - km", "time", "rep"]
+            values: ["kg - rep", "time - km", "kg - km"]
         }
     ];
 

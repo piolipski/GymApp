@@ -7,10 +7,10 @@ import {
     TextInput,
     Alert
 } from 'react-native';
-import CheckBox from '../CheckBox';
+import CheckBox from '../CheckBox.js';
 import { Text } from '../Text.js';
-import { useAlarm } from './AlarmContext';
-import { setItem, getItem } from '../database/DataStorage';
+import { useAlarm } from './AlarmContext.js';
+import { setItem, getItem } from '../database/DataStorage.js';
 
 export default function Alarm() {
 

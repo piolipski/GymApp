@@ -1,7 +1,6 @@
 import { TextInput, View, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
 import SearchSVG from '../../images/SearchSVG.svg';
 import { Text } from '../Text.js';
-import  ExerciseForm  from './ExerciseForm.js';
 import { useState, useEffect } from 'react';
 import { getAllExercises } from '../database/DataStorage.js';
 import { useIsFocused } from '@react-navigation/native';

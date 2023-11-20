@@ -12,12 +12,14 @@ import {
 import React, { useState } from 'react';
 import { Text } from '../Text.js';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
-import Alarm from '../Alarm/Alarm.js';
+import Alarm from '../alarm/Alarm.js';
+import { useNavigation } from '@react-navigation/native';
 
 const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 export default function Settings() {
     //unit system
+    const navigation = useNavigation();
     const [unitSystem, setUnitSystem] = useState('kg');
     const [distanceSystem, setDistanceSystem] = useState('km');
     const [modalVisible, setModalVisible] = useState(false);
@@ -32,6 +34,13 @@ export default function Settings() {
 
     const setDarkModeOn = () => { setDarkMode(true); }
     const setDarkModeOff = () => { setDarkMode(false); }
+
+    const handleLoginButton = () => {
+        navigation.navigate('Login');
+    }
+    const handleRegisterButton = () => {
+        navigation.navigate('Register');
+    }
 
 
 
@@ -60,13 +69,13 @@ export default function Settings() {
                 <Text style={styles.settingsCategory}>Account</Text>
                 <View style={[styles.container, { gap: 0, paddingTop: 0 }]}>
                     <View style={styles.profileButton}>
-                        <TouchableOpacity style={styles.profileTouch}>
+                        <TouchableOpacity style={styles.profileTouch} onPress={handleLoginButton}>
                             <Text style={styles.profileText}>Login</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.profileButton, { borderBottomWidth: 0, paddingBottom: 0 }]}>
-                        <TouchableOpacity style={styles.profileTouch}>
+                        <TouchableOpacity style={styles.profileTouch} onPress={handleRegisterButton}>
                             <Text style={styles.profileText}>Register</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
@@ -82,9 +91,9 @@ export default function Settings() {
                     onRequestClose={() => {
                         setModalVisible(!modalVisible);
                     }}>
-                    <Pressable 
-                    style={styles.modalContainer} 
-                    onPress={(event) => event.currentTarget===event.target && setModalVisible(false)}>
+                    <Pressable
+                        style={styles.modalContainer}
+                        onPress={(event) => event.currentTarget === event.target && setModalVisible(false)}>
                         <Alarm />
                     </Pressable>
                 </Modal>

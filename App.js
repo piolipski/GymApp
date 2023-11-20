@@ -6,7 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text } from './components/Text.js';
 import { useFonts } from 'expo-font';
-import { AlarmContextProvider } from './components/Alarm/AlarmContext.js';
+import { AlarmContextProvider } from './components/alarm/AlarmContext.js';
+import { DateContextProvider } from './components/date/DateContext.js';
 
 import WorkoutLog from './components/workout/WorkoutLog.js';
 import Exercises from './components/exercises/Exercises.js';
@@ -92,7 +93,7 @@ function ExercisesWrapper() {
         ),
       }} />
       <Stack.Screen name="CreateExerciseTab" component={CreateExerciseWrapper} options={{ ...headerOptions, headerShown: false, title: "Create Exercise" }} />
-      <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({...headerOptions, title: route.params.key1 })} />
+      <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
     </Stack.Navigator>
   )
 }
@@ -137,15 +138,17 @@ export default function App() {
 
   return (
     <AlarmContextProvider>
-      <NavigationContainer>
-        <Tab.Navigator tabBar={Navigation}>
-          <Tab.Screen name="WorkoutLogTab" component={WorkoutsWrapper} options={{ tabBarIcon: WorkoutIcon, headerShown: false, title: "WorkoutLog" }} />
-          <Tab.Screen name="CalendarTab" component={Calendar} options={{ tabBarIcon: CalendarIcon, headerShown: false, title: "Calendar" }} />
-          <Tab.Screen name="ExercisesTab" component={ExercisesWrapper} options={{ tabBarIcon: ExerciseIcon, headerShown: false, title: "Exercises" }} />
-          <Tab.Screen name="FeedTab" component={Feed} options={{ tabBarIcon: FeedIcon, ...headerOptions, title: "Feed" }} />
-          <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
-        </Tab.Navigator>
-      </NavigationContainer>
+      <DateContextProvider>
+        <NavigationContainer>
+          <Tab.Navigator tabBar={Navigation}>
+            <Tab.Screen name="WorkoutLogTab" component={WorkoutsWrapper} options={{ tabBarIcon: WorkoutIcon, headerShown: false, title: "WorkoutLog" }} />
+            <Tab.Screen name="CalendarTab" component={Calendar} options={{ tabBarIcon: CalendarIcon, headerShown: false, title: "Calendar" }} />
+            <Tab.Screen name="ExercisesTab" component={ExercisesWrapper} options={{ tabBarIcon: ExerciseIcon, headerShown: false, title: "Exercises" }} />
+            <Tab.Screen name="FeedTab" component={Feed} options={{ tabBarIcon: FeedIcon, ...headerOptions, title: "Feed" }} />
+            <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </DateContextProvider>
     </AlarmContextProvider>
   );
 }
