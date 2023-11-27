@@ -12,6 +12,7 @@ import {
 import React, { useState } from 'react';
 import { Text } from '../Text.js';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
+import AlarmSVG from '../../images/AlarmSVG.svg';
 import Alarm from '../alarm/Alarm.js';
 import { useNavigation } from '@react-navigation/native';
 
@@ -83,7 +84,6 @@ export default function Settings() {
                 </View>
                 <Text style={styles.settingsCategory}>Application settings</Text>
                 <View style={styles.container}>
-                </View>
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -98,10 +98,11 @@ export default function Settings() {
                     </Pressable>
                 </Modal>
                 <TouchableOpacity
-                    style={[styles.button, styles.buttonOpen]}
+                    style={styles.profileTouch}
                     onPress={() => setModalVisible(true)}>
-                    <Text style={styles.textStyle}>Show Modal</Text>
+                        <Text style={{ fontSize: 16 }}> Alarm settings</Text>
                 </TouchableOpacity>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

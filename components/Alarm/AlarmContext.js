@@ -10,14 +10,14 @@ export const AlarmContextProvider = ({ children }) => {
   const timer = useRef(null);
   const [seconds, setSeconds] = useState(5);
   const [status, setStatus] = useState('stopped');
-  const [vibration, setVibration] = useState(null);
-  const [sound, setSound] = useState(null);
   const [autoStart, setAutoStart] = useState(null);
   const notificationId = useRef(null);
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldPlaySound: false,
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
     }),
   });
 
@@ -30,22 +30,14 @@ export const AlarmContextProvider = ({ children }) => {
     setStatus('running');
     const targetTime = Date.now() + initialSeconds * ONE_SECOND_IN_MS;
 
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
-
     const newNotificationId = await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Timer Finished',
         body: 'Your timer has finished!',
-        sound: false,
-        vibrate: false,
+        sound:await getItem(['key', 'sound']),
+        vibrate: await getItem(['key', 'vibration']),
       },
+
       trigger: { date: new Date(targetTime) },
     });
     notificationId.current = newNotificationId;
@@ -74,12 +66,8 @@ export const AlarmContextProvider = ({ children }) => {
 
   useEffect(() => {
     async function fetchLocalData(){
-         const vibrationBoolean = await getItem(['key', 'vibration']);
-         const soundBoolean = await getItem(['key', 'sound']);
          const autoStartBoolean = await getItem(['key', 'autoStart']);
 
-         setVibration(vibrationBoolean);
-         setSound(soundBoolean);
          setAutoStart(autoStartBoolean);
      };
      fetchLocalData();
@@ -92,8 +80,6 @@ export const AlarmContextProvider = ({ children }) => {
         start, stop,
         seconds, setSeconds, onSecondsChange,
         status,
-        sound, setSound,
-        vibration, setVibration,
         autoStart, setAutoStart,
       }}
     >

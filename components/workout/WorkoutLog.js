@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
 import { Text } from '../Text.js';
-import { useRoute, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { useDate } from '../date/DateContext.js';
 import { getItem } from '../database/DataStorage.js'
@@ -20,7 +20,7 @@ export default function WorkoutLog({ navigation }) {
   const isFocused = useIsFocused();
   const date = useDate();
 
-  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState([])
+  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState({})
 
 
   const handleStartNewWorkoutButton = () => {
@@ -89,9 +89,8 @@ export default function WorkoutLog({ navigation }) {
   useEffect(() => {
 
     const fetchExercise = async () => {
-      const fetchedTodayWorkoutData = await getItem(['workout', format(date.currentDate, 'dd-MM-yyyy')]);
-
-      setSelectedDayExerciseData(fetchedTodayWorkoutData)
+      const fetchedTodayWorkoutData = await getItem(['workout', format(date.currentDate, 'dd-MM-yyyy')]) ?? {};
+      setSelectedDayExerciseData(fetchedTodayWorkoutData);
     }
 
     if (isFocused) {
@@ -112,7 +111,7 @@ export default function WorkoutLog({ navigation }) {
           <RightArrowSVG height={13} width={13} />
         </TouchableOpacity>
       </View>
-      {selectedDayExerciseData ?
+      {Object.keys(selectedDayExerciseData).length !== 0 ?
         (
           <View style={{ flex: 1, paddingTop: 15 }}>
             <ScrollView>

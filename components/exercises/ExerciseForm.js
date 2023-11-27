@@ -1,10 +1,10 @@
-import { SafeAreaView, View, TouchableOpacity, StyleSheet, StatusBar, TextInput } from "react-native"
-import { Text } from "../Text"
+import { SafeAreaView, View, TouchableOpacity, StyleSheet, StatusBar, TextInput } from "react-native";
+import { Text } from "../Text";
 import { useDate } from "../date/DateContext";
 import { useRoute, useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
 import { format } from 'date-fns';
-import { setItem, getItem, deleteItem } from "../database/DataStorage";
+import { setItem, getItem } from "../database/DataStorage";
 import { ScrollView } from "react-native-gesture-handler";
 
 import CalendarSVG from '../../images/CalendarSVG.svg';
@@ -21,6 +21,7 @@ export default function ExerciseForm() {
     const exerciseName = route.params.key1;
 
     const selectedSeriesId = useRef(null);
+    const category = useRef(null);
 
     const [todaySelected, setTodaySelected] = useState(true)
     const [editMode, setEditMode] = useState(false);
@@ -140,6 +141,14 @@ export default function ExerciseForm() {
             }
         }
 
+        let existingCategories = await getItem(['calendar', 'category']);
+        existingCategories = existingCategories || {};
+
+        const currentCategories = existingCategories[format(chosenDate.currentDate, 'dd-MM-yyyy')] || [];
+        if (!currentCategories.includes(category.current.toLowerCase())) {
+            currentCategories.push(category.current.toLowerCase());
+        }
+
         const updatedHistory = {
             ...exerciseHistoryData,
             [format(chosenDate.currentDate, 'dd-MM-yyyy')]: [...series, singleSeries],
@@ -147,8 +156,7 @@ export default function ExerciseForm() {
         setExerciseHistoryData(updatedHistory);
 
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], { ...(exerciseData ?? {}), ...thisWorkoutData })
-        await setItem(['workout', exerciseName], updatedHistory);
-
+        await setItem(['history', exerciseName], updatedHistory);
     }
 
     const handleEditMode = (id) => {
@@ -243,34 +251,52 @@ export default function ExerciseForm() {
         setEditMode(false);
         selectedSeriesId.current = null;
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-        await setItem(['workout', exerciseName], updatedHistorySeries);
+        await setItem(['history', exerciseName], updatedHistorySeries);
     };
 
 
     const handleDeleteButton = async () => {
-        const seriesAfterDelete = series.filter((element) => { return element.id !== selectedSeriesId.current });
+        const seriesAfterDelete = series.filter((element) => {
+            return element.id !== selectedSeriesId.current;
+        });
+    
         const historySeriesAfterDelete = {
             ...exerciseHistoryData,
-            [format(chosenDate.currentDate, 'dd-MM-yyyy')]: exerciseHistoryData[format(chosenDate.currentDate, 'dd-MM-yyyy')].filter(
-                (element) => { return element.id !== selectedSeriesId.current }
-            )
-        }
-
+            [format(chosenDate.currentDate, 'dd-MM-yyyy')]: seriesAfterDelete,
+        };
+    
         const updatedThisWorkoutData = {
             ...exerciseData,
             [exerciseName]: {
-                series: seriesAfterDelete
-            }
-
+                series: seriesAfterDelete,
+            },
+        };
+    
+        let existingCategories = await getItem(['calendar', 'category']);
+        existingCategories = existingCategories || {};
+    
+        const currentDateKey = format(chosenDate.currentDate, 'dd-MM-yyyy');
+        const currentCategories = existingCategories[currentDateKey] || [];
+    
+        let updatedCategoriesData = { ...existingCategories };
+    
+        if (seriesAfterDelete.length === 0) {
+            updatedCategoriesData[currentDateKey] = currentCategories.filter(
+                (value) => value !== category.current?.toLowerCase()
+            );
+    
+            delete updatedThisWorkoutData[exerciseName];
         }
-
+    
         setSeries(seriesAfterDelete);
         setExerciseHistoryData(historySeriesAfterDelete);
         setEditMode(false);
         selectedSeriesId.current = null;
+    
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-        await setItem(['workout', exerciseName], historySeriesAfterDelete);
-    }
+    };
+    
+    
 
     const renderInputsBasedOnType = () => {
         if (type.type1 === 'kg' && type.type2 === 'rep') {
@@ -409,10 +435,10 @@ export default function ExerciseForm() {
         const fetchExercise = async () => {
             const fetchedExerciseData = await getItem(['exercise', exerciseName]);
             const fetchedWorkoutData = await getItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')]);
-            const fetchedHistoryData = await getItem(['workout', exerciseName]);
+            const fetchedHistoryData = await getItem(['history', exerciseName]);
             const fetchedType = fetchedExerciseData.type.split(' - ');
             const existingExercise = fetchedWorkoutData?.[exerciseName]?.series;
-            
+
             if (fetchedHistoryData) {
                 const sortedData = Object.entries(fetchedHistoryData)
                     .sort((a, b) => new Date(b[0]) - new Date(a[0]))
@@ -422,7 +448,7 @@ export default function ExerciseForm() {
                     }, {});
                 setExerciseHistoryData(sortedData ?? []);
             }
-
+            category.current = fetchedExerciseData?.['category']
             setSeries(existingExercise ?? []);
             setExerciseData(fetchedWorkoutData ?? null);
 

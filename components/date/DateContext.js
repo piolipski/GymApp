@@ -36,6 +36,7 @@ export const DateContextProvider = ({ children }) => {
         <DateContext.Provider
             value={{
                 currentDate,
+                setCurrentDate,
                 handleGoToTomorrow,
                 handleGoToYesterday,
                 whatDay

@@ -116,7 +116,7 @@ function WorkoutsWrapper() {
         ...headerOptions, title: "Workout Log"
       }} />
       <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
-      <Stack.Screen name="CalendarView" component={Calendar} options={{ tabBarIcon: CalendarIcon, title: "Calendar" }} />
+      <Stack.Screen name="CalendarView" component={Calendar} options={{ ...headerOptions, tabBarIcon: CalendarIcon, title: "Calendar" }} />
     
     </Stack.Navigator>
   )
@@ -140,7 +140,7 @@ export default function App() {
         <NavigationContainer>
           <Tab.Navigator tabBar={Navigation}>
             <Tab.Screen name="WorkoutLogTab" component={WorkoutsWrapper} options={{ tabBarIcon: WorkoutIcon, headerShown: false, title: "WorkoutLog" }} />
-            <Tab.Screen name="CalendarTab" component={Calendar} options={{ tabBarIcon: CalendarIcon, headerShown: false, title: "Calendar" }} />
+            <Tab.Screen name="CalendarTab" component={Calendar} options={{...headerOptions, tabBarIcon: CalendarIcon, title: "Calendar" }} />
             <Tab.Screen name="ExercisesTab" component={ExercisesWrapper} options={{ tabBarIcon: ExerciseIcon, headerShown: false, title: "Exercises" }} />
             <Tab.Screen name="FeedTab" component={Feed} options={{ tabBarIcon: FeedIcon, ...headerOptions, title: "Feed" }} />
             <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />

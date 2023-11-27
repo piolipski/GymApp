@@ -11,24 +11,32 @@ import CheckBox from '../CheckBox.js';
 import { Text } from '../Text.js';
 import { useAlarm } from './AlarmContext.js';
 import { setItem, getItem } from '../database/DataStorage.js';
+import { useState, useEffect } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function Alarm() {
 
+    const isFocused = useIsFocused();
+
     const alarm = useAlarm();
-    // const [vibration, setVibration] = useState(null);
-    // const [sound, setSound] = useState(null);
-    // const [autoStart, setAutoStart] = useState(null);
+    const [soundAndVibrationBoolean, setSoundAndVibrationBoolean] = useState(false);
     const timeAmount = alarm.seconds.toString();
 
-    const vibrationChange = async () => {
-        const boolean = !alarm.vibration;
-        alarm.setVibration(boolean);
-        await setItem(['key', 'vibration'], boolean);
-    }
-    const soundChange = async () => {
-        const boolean = !alarm.sound;
-        alarm.setSound(boolean);
-        await setItem(['key', 'sound'], boolean);
+    const vibrationSoundChange = async () => {
+        let vibrationVariable;
+        let soundVariable;
+        const vibrationValue = await getItem(['key', 'vibration']);
+        if (vibrationValue === 'null') {
+            vibrationVariable = [250, 250, 250, 250];
+            soundVariable = 'default';
+        } else {
+            vibrationVariable = 'null';
+            soundVariable = false;
+        }
+        const boolean = !soundAndVibrationBoolean;
+        setSoundAndVibrationBoolean(boolean);
+        await setItem(['key', 'vibration'], vibrationVariable);
+        await setItem(['key', 'sound'], soundVariable);
     }
     const autoStartChange = async () => {
         const boolean = !alarm.autoStart;
@@ -56,18 +64,21 @@ export default function Alarm() {
         }
     };
 
-    // useEffect(() => {
-    //    async function fetchLocalData(){
-    //         const vibrationBoolean = await getItem(['key', 'vibration']);
-    //         const soundBoolean = await getItem(['key', 'sound']);
-    //         const autoStartBoolean = await getItem(['key', 'autoStart']);
-    //         setVibration(vibrationBoolean);
-    //         setSound(soundBoolean);
-    //         setAutoStart(autoStartBoolean);
-    //     };
-    //     fetchLocalData();
-        
-    // }, []);
+    useEffect(() => {
+        async function fetchLocalData() {
+            const vibrationValue = await getItem(['key', 'vibration']);
+            if (vibrationValue=== 'null') {
+                setSoundAndVibrationBoolean(false);
+            } else {
+                setSoundAndVibrationBoolean(true);
+            }
+
+        };
+        if (isFocused) {
+            fetchLocalData();
+        }
+
+    }, [isFocused]);
 
     const startTimer = () => {
         if (timeAmount === '0') {
@@ -117,14 +128,9 @@ export default function Alarm() {
                 </View>
                 <View style={styles.checkBoxContainer}>
                     <CheckBox
-                        onPress={vibrationChange}
-                        title="Vibration"
-                        isChecked={alarm.vibration}
-                    />
-                    <CheckBox
-                        onPress={soundChange}
-                        title="Sound"
-                        isChecked={alarm.sound}
+                        onPress={vibrationSoundChange}
+                        title="Vibration&Sound"
+                        isChecked={soundAndVibrationBoolean}
                     />
                     <CheckBox
                         onPress={autoStartChange}
