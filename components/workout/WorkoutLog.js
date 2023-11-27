@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useDate } from '../date/DateContext.js';
 import { getItem } from '../database/DataStorage.js'
 import { format } from 'date-fns';
-
 import NewWorkoutSVG from '../../images/NewWorkoutSVG.svg';
 import StartRoutineSVG from '../../images/StartRoutineSVG.svg';
 import LeftArrowSVG from '../../images/LeftArrowSVG.svg';
@@ -16,19 +15,21 @@ import { ScrollView } from 'react-native-gesture-handler';
 const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 export default function WorkoutLog({ navigation }) {
-
   const isFocused = useIsFocused();
   const date = useDate();
 
-  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState([])
-
+  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState([]);
 
   const handleStartNewWorkoutButton = () => {
     navigation.navigate('ExercisesTab');
   }
 
   const handleExerciseOnPress = (name) => {
-    navigation.navigate('ExerciseForm', {key1: name});
+    navigation.navigate('ExerciseForm', { key1: name });
+  }
+
+  const handleRoutineOnPress = () => {
+    navigation.navigate('RoutinesTab');
   }
 
   const renderSeries = (data) => {
@@ -55,19 +56,19 @@ export default function WorkoutLog({ navigation }) {
       });
 
       return (
-        <TouchableOpacity 
-        key={key} 
-        style={{
-          flex: 1,
-          borderRadius: 15,
-          marginBottom: 15,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 4,
-        }}
-        onPress={() => handleExerciseOnPress(key)}
+        <TouchableOpacity
+          key={key}
+          style={{
+            flex: 1,
+            borderRadius: 15,
+            marginBottom: 15,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 4,
+          }}
+          onPress={() => handleExerciseOnPress(key)}
         >
           <Text style={{
             fontSize: 20,
@@ -85,13 +86,12 @@ export default function WorkoutLog({ navigation }) {
     });
   };
 
-
   useEffect(() => {
 
     const fetchExercise = async () => {
       const fetchedTodayWorkoutData = await getItem(['workout', format(date.currentDate, 'dd-MM-yyyy')]);
-
       setSelectedDayExerciseData(fetchedTodayWorkoutData)
+      
     }
 
     if (isFocused) {
@@ -130,7 +130,7 @@ export default function WorkoutLog({ navigation }) {
                 <NewWorkoutSVG />
                 <Text style={{ color: 'hsla(0,0%,0%, 0.60)', paddingTop: 5 }}>Start New Workout</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.workoutButtonContainer}>
+              <TouchableOpacity style={styles.workoutButtonContainer} onPress={handleRoutineOnPress} >
                 <StartRoutineSVG />
                 <Text style={{ color: 'hsla(0,0%,0%, 0.60)', paddingTop: 5 }}>From Routine</Text>
               </TouchableOpacity>

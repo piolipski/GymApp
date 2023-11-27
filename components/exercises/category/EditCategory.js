@@ -2,8 +2,18 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Pressable } from 'react-native';
 import { Text } from '../../Text';
 
-export default function EditCategory({ handleEditCategory, handleDeleteCategory, initialCategoryName }) {
+export default function EditCategory({ handleEditCategory, handleDeleteCategory, initialCategoryName, setEditModalOpen }) {
     const [categoryName, setCategoryName] = useState(initialCategoryName);
+
+    const handleSave = async () => {
+        await handleEditCategory(categoryName);
+        setEditModalOpen(false);
+    };
+
+    const handleDelete = async () => {
+        await handleDeleteCategory(categoryName);
+        setEditModalOpen(false);
+    }
 
     return (
         <View style={[{
@@ -47,7 +57,7 @@ export default function EditCategory({ handleEditCategory, handleDeleteCategory,
                 flexDirection: 'row',
             }]}>
                 <Pressable style={[{ flex: 1 }]}
-                    onPress={() => handleEditCategory(categoryName)}
+                    onPress={handleSave}
                 >
                     <Text style={[{
                         textAlign: 'center',
@@ -61,7 +71,7 @@ export default function EditCategory({ handleEditCategory, handleDeleteCategory,
                     </Text>
                 </Pressable>
                 <Pressable style={[{ flex: 1 }]}
-                    onPress={() => handleDeleteCategory(categoryName)}
+                    onPress={handleDelete}
                 >
                     <Text style={[{
                         textAlign: 'center',

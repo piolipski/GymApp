@@ -9,10 +9,10 @@ import { useFonts } from 'expo-font';
 import { useState } from 'react';
 import { AlarmContextProvider } from './components/alarm/AlarmContext.js';
 import { DateContextProvider } from './components/date/DateContext.js';
+import { CategoryContextProvider } from './components/exercises/category/CategoryContext.js';
 
 import WorkoutLog from './components/workout/WorkoutLog.js';
 import Exercises from './components/exercises/Exercises.js';
-import Feed from './components/Feed.js';
 import Calendar from './components/calendar/Calendar.js';
 import Settings from './components/settings/Settings.js';
 
@@ -22,9 +22,12 @@ import Register from './components/settings/profile/Register.js'
 import CreateExercise from './components/exercises/CreateExercise.js';
 import ExerciseForm from './components/exercises/ExerciseForm.js';
 import CategoryList from './components/exercises/category/CategoryList.js';
-import TypeList from './components/exercises/TypeList.js';
+import TypeList from './components/exercises/type/TypeList.js';
+import EditExercise from './components/exercises/EditExercise.js';
 
-import FeedSVG from './images/FeedSVG.svg';
+import Routines from './components/routine/Routines.js';
+import CreateRoutine from './components/routine/CreateRoutine.js';
+
 import WorkoutLogSVG from './images/WorkoutLogSVG.svg';
 import ExerciseSVG from './images/ExerciseSVG.svg';
 import SettingsSVG from './images/SettingsSVG.svg';
@@ -34,6 +37,8 @@ import {
   Inter_500Medium,
   Inter_700Bold
 } from '@expo-google-fonts/inter';
+import { TypeContextProvider } from './components/exercises/type/TypeContext.js';
+import { RoutineContextProvider } from './components/routine/RoutineContext.js';
 
 
 const WorkoutIcon = ({ focused, color, size }) => {
@@ -52,13 +57,6 @@ const SettingsIcon = ({ focused, color, size }) => {
 
   return (
     <SettingsSVG height={size} fill={color} />
-  )
-}
-
-const FeedIcon = ({ focused, color, size }) => {
-
-  return (
-    <FeedSVG height={size} fill={color} />
   )
 }
 
@@ -95,6 +93,7 @@ function ExercisesWrapper() {
       }} />
       <Stack.Screen name="CreateExerciseTab" component={CreateExerciseWrapper} options={{ ...headerOptions, headerShown: false, title: "Create Exercise" }} />
       <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
+      <Stack.Screen name="EditExerciseTab" component={EditExerciseWrapper} options={{ ...headerOptions, headerShown: false, title: "Edit Exercise" }} />
     </Stack.Navigator>
   )
 }
@@ -119,8 +118,49 @@ function CreateExerciseWrapper() {
   )
 }
 
-function WorkoutsWrapper() {
+function EditExerciseWrapper({ route }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="EditExercise"
+        component={EditExercise}
+        options={{ ...headerOptions, title: "Edit Exercise" }}
+        initialParams={{ exercise: route.params?.exercise }}
+      />
+      <Stack.Screen name="CategoryList" options={{
+        ...headerOptions, title: "Categories", headerRight: () => (
+          <TouchableOpacity onPress={() => { setModalOpen(true) }}>
+            <Text style={{ fontSize: 16, marginRight: 15, color: '#006EE6' }}>Create</Text>
+          </TouchableOpacity>
+        ),
+      }}>
+        {(props) => <CategoryList {...props} modalOpen={modalOpen} setModalOpen={setModalOpen} />}
+      </Stack.Screen>
+      <Stack.Screen name="TypeList" component={TypeList} options={{ ...headerOptions, title: "Types" }} />
+    </Stack.Navigator>
+  )
+}
+
+function RoutinesWrapper() {
   const navigation = useNavigation();
+
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Routines" component={Routines} options={{
+        ...headerOptions, headerRight: () => (
+          <TouchableOpacity onPress={() => { navigation.navigate('CreateRoutine') }}>
+            <Text style={{ fontSize: 16, marginRight: 15, color: '#006EE6' }}>Create</Text>
+          </TouchableOpacity>
+        ),
+      }} />
+      <Stack.Screen name="CreateRoutine" component={CreateRoutine} options={({ route }) => ({ ...headerOptions, title: route.params?.key ? route.params.key : 'Create Routine' })} />
+      <Stack.Screen name="Exercises" component={Exercises} options={{ ...headerOptions, title: "Exercises" }} />
+    </Stack.Navigator>
+  )
+}
+
+function WorkoutsWrapper() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="WorkoutLog" component={WorkoutLog} options={{
@@ -128,7 +168,7 @@ function WorkoutsWrapper() {
       }} />
       <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
       <Stack.Screen name="CalendarView" component={Calendar} options={{ tabBarIcon: CalendarIcon, title: "Calendar" }} />
-    
+      <Stack.Screen name="RoutinesTab" component={RoutinesWrapper} options={{ ...headerOptions, headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -148,15 +188,20 @@ export default function App() {
   return (
     <AlarmContextProvider>
       <DateContextProvider>
-        <NavigationContainer>
-          <Tab.Navigator tabBar={Navigation}>
-            <Tab.Screen name="WorkoutLogTab" component={WorkoutsWrapper} options={{ tabBarIcon: WorkoutIcon, headerShown: false, title: "WorkoutLog" }} />
-            <Tab.Screen name="CalendarTab" component={Calendar} options={{ tabBarIcon: CalendarIcon, headerShown: false, title: "Calendar" }} />
-            <Tab.Screen name="ExercisesTab" component={ExercisesWrapper} options={{ tabBarIcon: ExerciseIcon, headerShown: false, title: "Exercises" }} />
-            <Tab.Screen name="FeedTab" component={Feed} options={{ tabBarIcon: FeedIcon, ...headerOptions, title: "Feed" }} />
-            <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
-          </Tab.Navigator>
-        </NavigationContainer>
+        <RoutineContextProvider>
+          <CategoryContextProvider>
+            <TypeContextProvider>
+              <NavigationContainer>
+                <Tab.Navigator tabBar={Navigation}>
+                  <Tab.Screen name="WorkoutLogTab" component={WorkoutsWrapper} options={{ tabBarIcon: WorkoutIcon, headerShown: false, title: "WorkoutLog" }} />
+                  <Tab.Screen name="CalendarTab" component={Calendar} options={{ tabBarIcon: CalendarIcon, headerShown: false, title: "Calendar" }} />
+                  <Tab.Screen name="ExercisesTab" component={ExercisesWrapper} options={{ tabBarIcon: ExerciseIcon, headerShown: false, title: "Exercises" }} />
+                  <Tab.Screen name="SettingsTab" component={SettingsWrapper} options={{ tabBarIcon: SettingsIcon, headerShown: false, title: "Settings" }} />
+                </Tab.Navigator>
+              </NavigationContainer>
+            </TypeContextProvider>
+          </CategoryContextProvider>
+        </RoutineContextProvider>
       </DateContextProvider>
     </AlarmContextProvider>
   );

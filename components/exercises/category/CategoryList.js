@@ -1,20 +1,20 @@
-import { View, TouchableOpacity, StyleSheet, SafeAreaView, Modal, Pressable, TextInput, Button } from 'react-native';
+import { TouchableOpacity, StyleSheet, SafeAreaView, Modal, Pressable } from 'react-native';
 import { Text } from '../../Text.js';
 import { ScrollView } from 'react-native-gesture-handler';
 import CreateCategory from './CreateCategory.js';
 import EditCategory from './EditCategory.js';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { getAllExercises, getItem, setItem } from '../../database/DataStorage.js';
+import { useCategory } from './CategoryContext.js';
+import { useCategoryActions } from './CategoryActions.js';
 
-export default function CategoryList({ route, navigation, modalOpen, setModalOpen }) {
+export default function CategoryList({ navigation, modalOpen, setModalOpen }) {
     const isFocused = useIsFocused();
-    const { onCategorySelected, selectedCategory } = route?.params;
+    const { selectedCategory, setSelectedCategory } = useCategory();
 
-    const [categories, setCategories] = useState([]);
+    const { categories, selectedCategoryIndex, fetchCategories, handleEditCategory, handleDeleteCategory, setSelectedCategoryIndex } = useCategoryActions();
 
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(null);
 
     useEffect(() => {
         if (isFocused) {
@@ -22,16 +22,15 @@ export default function CategoryList({ route, navigation, modalOpen, setModalOpe
         }
     }, [isFocused]);
 
-    const fetchCategories = async () => {
-        const categoryArray = await getItem(['key', 'category']) || [];
-        setCategories(categoryArray);
-    };
+    useEffect(() => {
+        if (!editModalOpen) {
+            fetchCategories();
+        }
+    }, [editModalOpen]);
 
     const handleCategoryChange = (category) => {
-        onCategorySelected(category);
-        navigation.goBack({
-            selectedCategory: category
-        });
+        setSelectedCategory(category);
+        navigation.goBack();
     };
 
     const refreshCategories = async () => {
@@ -41,41 +40,6 @@ export default function CategoryList({ route, navigation, modalOpen, setModalOpe
     const handleLongPress = (index) => {
         setSelectedCategoryIndex(index);
         setEditModalOpen(true);
-    };
-
-    const handleEditCategory = async (newCategoryName) => {
-        newCategoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1);
-
-        const newCategories = [...categories];
-        const oldCategoryName = newCategories[selectedCategoryIndex];
-        newCategories[selectedCategoryIndex] = newCategoryName;
-        setCategories(newCategories);
-        await setItem(['key', 'category'], newCategories);
-
-        const exercises = await getAllExercises();
-        const updatedExercises = exercises.map(exercise => {
-            if (exercise.category === oldCategoryName) {
-                exercise.category = newCategoryName;
-            }
-            return exercise;
-        });
-
-        await Promise.all(updatedExercises.map(exercise => setItem(['exercise', exercise.name], exercise)));
-        setEditModalOpen(false);
-    };
-
-    const handleDeleteCategory = async (categoryName) => {
-        const exercises = await getAllExercises();
-        const exercisesInCategory = exercises.filter(exercise => exercise.category === categoryName);
-
-        if (exercisesInCategory.length > 0) {
-            alert("Please remove all exercises from the category before deleting it.");
-        } else {
-            const newCategories = categories.filter(category => category !== categoryName);
-            setCategories(newCategories);
-            await setItem(['key', 'category'], newCategories);
-            setEditModalOpen(false);
-        }
     };
 
     return (
@@ -110,7 +74,12 @@ export default function CategoryList({ route, navigation, modalOpen, setModalOpe
                     onPress={(event) => event.currentTarget === event.target && setEditModalOpen(false)}
                     style={styles.modalContainer}
                 >
-                    <EditCategory handleEditCategory={handleEditCategory} handleDeleteCategory={handleDeleteCategory} initialCategoryName={categories[selectedCategoryIndex]} />
+                    <EditCategory
+                        handleEditCategory={handleEditCategory}
+                        handleDeleteCategory={handleDeleteCategory}
+                        initialCategoryName={categories[selectedCategoryIndex]}
+                        setEditModalOpen={setEditModalOpen}
+                    />
                 </Pressable>
             </Modal>
             <Modal

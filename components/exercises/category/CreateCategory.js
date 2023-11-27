@@ -8,7 +8,6 @@ export default function CreateCategory({ setModalOpen, refreshCategories }) {
     const [categoryName, setCategoryName] = useState('');
 
     const saveCategory = async () => {
-        // might need to rewrite it, but it works for now :)
         if (categoryName.trim() === '') {
             alert('Category name cannot be empty');
             return;

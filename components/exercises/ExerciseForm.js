@@ -147,7 +147,7 @@ export default function ExerciseForm() {
         setExerciseHistoryData(updatedHistory);
 
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], { ...(exerciseData ?? {}), ...thisWorkoutData })
-        await setItem(['workout', exerciseName], updatedHistory);
+        await setItem(['history', exerciseName], updatedHistory);
 
     }
 
@@ -243,7 +243,7 @@ export default function ExerciseForm() {
         setEditMode(false);
         selectedSeriesId.current = null;
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-        await setItem(['workout', exerciseName], updatedHistorySeries);
+        await setItem(['history', exerciseName], updatedHistorySeries);
     };
 
 
@@ -269,7 +269,7 @@ export default function ExerciseForm() {
         setEditMode(false);
         selectedSeriesId.current = null;
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-        await setItem(['workout', exerciseName], historySeriesAfterDelete);
+        await setItem(['history', exerciseName], historySeriesAfterDelete);
     }
 
     const renderInputsBasedOnType = () => {
@@ -409,7 +409,7 @@ export default function ExerciseForm() {
         const fetchExercise = async () => {
             const fetchedExerciseData = await getItem(['exercise', exerciseName]);
             const fetchedWorkoutData = await getItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')]);
-            const fetchedHistoryData = await getItem(['workout', exerciseName]);
+            const fetchedHistoryData = await getItem(['history', exerciseName]);
             const fetchedType = fetchedExerciseData.type.split(' - ');
             const existingExercise = fetchedWorkoutData?.[exerciseName]?.series;
             

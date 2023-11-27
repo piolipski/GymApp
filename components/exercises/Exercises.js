@@ -1,42 +1,75 @@
-import { TextInput, View, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
+import { TextInput, View, SafeAreaView, StyleSheet, ScrollView, Modal, Pressable } from 'react-native';
 import SearchSVG from '../../images/SearchSVG.svg';
 import { Text } from '../Text.js';
+import CheckBox from '../CheckBox.js';
 import { useState, useEffect } from 'react';
 import { getAllExercises } from '../database/DataStorage.js';
 import { useIsFocused } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Accordion from '../Accordion.js';
+import EditCategory from './category/EditCategory.js';
+import { useCategoryActions } from './category/CategoryActions.js';
+import ExerciseDetails from './ExerciseDetails.js';
 
-export default function Exercises({navigation}) {
+export default Exercises = ({ route, navigation }) => {
+    const isRoutine = route.params?.isRoutine ?? false;
 
     const isFocused = useIsFocused();
 
-    const [searchText, setSearchText] = useState('');
     const [exercises, setExercises] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [selectedExercises, setSelectedExercises] = useState([]);
-    const [filter, setFilter] = useState(false);
+    const [searchText, setSearchText] = useState('');
+
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [detailModalOpen, setDetailModalOpen] = useState(false);
+    const { selectedCategoryIndex, handleEditCategory, handleDeleteCategory, setSelectedCategoryIndex } = useCategoryActions();
+
+    const [selectedExercise, setSelectedExercise] = useState(null);
+
+    const [checkedExercises, setCheckedExercises] = useState(route.params?.selectedExercises || []);
+
+    const handleCheckboxPress = (exercise) => {
+        if (checkedExercises.some((ex) => ex.name === exercise.name)) {
+            setCheckedExercises(checkedExercises.filter((ex) => ex.name !== exercise.name));
+        } else {
+            setCheckedExercises([...checkedExercises, exercise]);
+        }
+    };
+
+    useEffect(() => {
+        console.log(checkedExercises);
+    }, [checkedExercises]);
+
+    useEffect(() => {
+        if (route.params?.onCheckedExercisesChange) {
+            route.params.onCheckedExercisesChange(checkedExercises);
+        }
+    }, [checkedExercises]);
 
     useEffect(() => {
         if (isFocused) {
             fetchExercises();
-        } else{
-            setSelectedExercises([]);
-            setFilter(false);
         }
     }, [isFocused]);
+
+    useEffect(() => {
+        if (!editModalOpen) {
+            fetchExercises();
+        }
+    }, [editModalOpen]);
+
+    useEffect(() => {
+        if (!detailModalOpen) {
+            fetchExercises();
+        }
+    }, [detailModalOpen]);
 
     const fetchExercises = async () => {
         const exerciseData = await getAllExercises();
         const categoriesData = exerciseData.map(exercise => { return exercise.category });
         const filteredCategories = categoriesData.filter((item, index) => categoriesData.indexOf(item) === index)
-        setCategories(filteredCategories);
+        setCategories(filteredCategories.sort());
         setExercises(exerciseData || []);
-    };
-
-    const handleCategoryButton = (e) => {
-        const filterdArray = exercises.filter((exercise) => exercise.category === e);
-        setSelectedExercises(filterdArray.sort());
-        setFilter(true);
     };
 
     const filteredExercises = exercises.filter(exercise => {
@@ -44,8 +77,13 @@ export default function Exercises({navigation}) {
     });
 
     const handleChosenExerciseButton = (name) => {
-        navigation.navigate('ExerciseForm', {key1: name});
+        navigation.navigate('ExerciseForm', { key1: name });
     }
+
+    const handleLongPress = (index) => {
+        setSelectedCategoryIndex(index);
+        setEditModalOpen(true);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -59,30 +97,86 @@ export default function Exercises({navigation}) {
                 />
             </View>
             <View style={{ flex: 1 }}>
-                <ScrollView style={styles.scrollView}>
-                    {filter ? (
-                        selectedExercises.map((exercise, index) => (
-                            <View style={styles.exerciseItem} key={index}>
-                                <TouchableOpacity onPress={() => {handleChosenExerciseButton(exercise.name)}}>
-                                <Text style={styles.exerciseName}>{exercise.name}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ))
-                    ) : (
-                        categories.map((category, index) => (
-                            <View style={styles.exerciseItem} key={index}>
-                                <TouchableOpacity onPress={() => {handleCategoryButton(category)}}>
-                                    <Text style={styles.exerciseName}>{category}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ))
-                    )}
-
+                <ScrollView>
+                    {categories.map((category, index) => (
+                        <Accordion
+                            onLongPress={() => handleLongPress(index)}
+                            key={index}
+                            title={category}
+                            data={filteredExercises.filter(exercise => exercise.category === category)}
+                            renderItem={(exercise, index) => {
+                                const backgroundColor = index % 2 === 0 ? '' : 'lightgray';
+                                return isRoutine ? (
+                                    <TouchableOpacity
+                                        style={[styles.exerciseItem, { backgroundColor }]}
+                                        key={index}
+                                        onPress={() => handleCheckboxPress(exercise)}
+                                    >
+                                        <View style={[{
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                        }]}>
+                                            <Text style={[styles.exerciseName, {}]}>{exercise.name}</Text>
+                                            <CheckBox isChecked={checkedExercises.some((ex) => ex.name === exercise.name)} />
+                                        </View>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.exerciseItem, { backgroundColor }]}
+                                        key={index}
+                                        onPress={() => { handleChosenExerciseButton(exercise.name) }}
+                                        onLongPress={() => { setSelectedExercise(exercise); setDetailModalOpen(true) }}
+                                    >
+                                        <Text style={styles.exerciseName}>{exercise.name}</Text>
+                                    </TouchableOpacity>
+                                );
+                            }}
+                        />
+                    ))}
                 </ScrollView>
             </View>
-        </SafeAreaView>
-    )
-}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={editModalOpen}
+                onRequestClose={() => {
+                    setEditModalOpen(!editModalOpen);
+                }}
+            >
+                <Pressable
+                    onPress={(event) => event.currentTarget === event.target && setEditModalOpen(false)}
+                    style={styles.modalContainer}
+                >
+                    <EditCategory
+                        handleEditCategory={handleEditCategory}
+                        handleDeleteCategory={handleDeleteCategory}
+                        initialCategoryName={categories[selectedCategoryIndex]}
+                        setEditModalOpen={setEditModalOpen}
+                    />
+                </Pressable>
+            </Modal>
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={detailModalOpen}
+                onRequestClose={() => {
+                    setEditModalOpen(!detailModalOpen);
+                }}
+            >
+                <Pressable
+                    onPress={(event) => event.currentTarget === event.target && setDetailModalOpen(false)}
+                    style={styles.modalContainer}
+                >
+                    <ExerciseDetails
+                        exercise={selectedExercise}
+                        setDetailModalOpen={setDetailModalOpen}
+                    />
+                </Pressable>
+            </Modal>
+        </SafeAreaView >
+    );
+};
 
 const styles = StyleSheet.create({
     searchBar: {
@@ -100,21 +194,29 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_700Bold',
     },
     exerciseItem: {
-        margin: 15,
-        padding: 10,
+        padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: 'hsla(0, 0%, 0%, 0.35)',
     },
     exerciseName: {
         fontSize: 16,
+        fontFamily: 'Inter_400Regular',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    saveButton: {
+        padding: 15,
+        marginHorizontal: 15,
+        borderRadius: 5,
+    },
+    saveButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 16,
         fontFamily: 'Inter_700Bold',
-    },
-    exerciseCategory: {
-        fontSize: 14,
-        fontFamily: 'Inter_400Regular',
-    },
-    exerciseDescription: {
-        fontSize: 12,
-        fontFamily: 'Inter_400Regular',
     }
 })

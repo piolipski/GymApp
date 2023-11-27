@@ -54,7 +54,7 @@ export const getAllExercises = async () => {
     try {
         let keys = await AsyncStorage.getAllKeys();
         let values = [];
-        
+
         for (const key of keys) {
             if (key.includes('exercise')) {
                 try {
@@ -75,14 +75,13 @@ export const getAllExercises = async () => {
     }
 };
 
-export const getAllTrainings = async () => {
+export const getAllWorkouts = async () => {
     try {
-        let keys = [];
+        let keys = await AsyncStorage.getAllKeys();;
         let values = [];
-        keys = await AsyncStorage.getAllKeys();
 
         for (const key of keys) {
-            if (key.includes('training')) {
+            if (key.includes('workout')) {
                 try {
                     const jsonValue = await AsyncStorage.getItem(key);
                     values.push(jsonValue != null ? JSON.parse(jsonValue) : null);
@@ -101,16 +100,43 @@ export const getAllTrainings = async () => {
     }
 };
 
+export const getAllRoutinesWithNames = async () => {
+    try {
+        let keys = await AsyncStorage.getAllKeys();
+        let values = [];
+
+        for (const key of keys) {
+            if (key.includes('routine')) {
+                try {
+                    const routineName = key.split(SEP)[1];
+                    const jsonValue = await AsyncStorage.getItem(key);
+                    const valuesWithName = {[routineName]: JSON.parse(jsonValue)}
+
+                    values.push(jsonValue != null ? valuesWithName : null);
+                } catch (error) {
+                    console.error('Error retrieving data: ', error);
+                    return null;
+                }
+            }
+        }
+
+        return values;
+
+    } catch (error) {
+        console.error('Error retrieving data: ', error);
+        return null;
+    }
+}
 
 const checkFirstTimeOpening = async () => {
     try {
-        const isFirstTimeOpened = await getItem(['key','isFirstTimeOpened']);
+        const isFirstTimeOpened = await getItem(['key', 'isFirstTimeOpened']);
 
         if (!isFirstTimeOpened) {
-            await setItem(['key','vibration'],false);
-            await setItem(['key','sound'],true);
-            await setItem(['key','autoStart'],false);
-            console.log('test',await getItem(['key','vibration']),await getItem(['key','sound']),await getItem(['key','autoStart']))
+            await setItem(['key', 'vibration'], false);
+            await setItem(['key', 'sound'], true);
+            await setItem(['key', 'autoStart'], false);
+            console.log('test', await getItem(['key', 'vibration']), await getItem(['key', 'sound']), await getItem(['key', 'autoStart']))
 
             await setItem(['key', 'isFirstTimeOpened'], true);
         }
