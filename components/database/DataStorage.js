@@ -54,7 +54,7 @@ export const getAllExercises = async () => {
     try {
         let keys = await AsyncStorage.getAllKeys();
         let values = [];
-        
+
         for (const key of keys) {
             if (key.includes('exercise')) {
                 try {
@@ -77,7 +77,7 @@ export const getAllExercises = async () => {
 
 export const getAllWorkouts = async () => {
     try {
-        let keys = await AsyncStorage.getAllKeys();
+        let keys = await AsyncStorage.getAllKeys();;
         let values = [];
 
         for (const key of keys) {
@@ -128,10 +128,37 @@ export const getAllWorkoutsWithDates = async () => {
     }
 }
 
+export const getAllRoutinesWithNames = async () => {
+    try {
+        let keys = await AsyncStorage.getAllKeys();
+        let values = [];
+
+        for (const key of keys) {
+            if (key.includes('routine')) {
+                try {
+                    const routineName = key.split(SEP)[1];
+                    const jsonValue = await AsyncStorage.getItem(key);
+                    const valuesWithName = {[routineName]: JSON.parse(jsonValue)}
+
+                    values.push(jsonValue != null ? valuesWithName : null);
+                } catch (error) {
+                    console.error('Error retrieving data: ', error);
+                    return null;
+                }
+            }
+        }
+
+        return values;
+
+    } catch (error) {
+        console.error('Error retrieving data: ', error);
+        return null;
+    }
+}
 
 const checkFirstTimeOpening = async () => {
     try {
-        const isFirstTimeOpened = await getItem(['key','isFirstTimeOpened']);
+        const isFirstTimeOpened = await getItem(['key', 'isFirstTimeOpened']);
 
         if (!isFirstTimeOpened) {
             await setItem(['key','vibration'],[250,250,250,250]);

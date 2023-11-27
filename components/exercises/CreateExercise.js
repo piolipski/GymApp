@@ -1,24 +1,55 @@
 import { View, StyleSheet, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
 import { Text } from '../Text.js';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
-import { useState } from 'react';
-import { setItem } from '../database/DataStorage.js';
+import { useState, useEffect } from 'react';
+import { setItem, getAllExercises } from '../database/DataStorage.js';
+import { useCategory } from './category/CategoryContext.js';
+import { useType } from './type/TypeContext.js';
 
 export default function CreateExercise({ navigation }) {
     const [exerciseName, setExerciseName] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedType, setSelectedType] = useState(null);
+    const { selectedCategory, setSelectedCategory } = useCategory(null);
+    const { selectedType, setSelectedType } = useType(null);
     const [exerciseDescription, setExerciseDescription] = useState('');
 
-    const handleCategorySelected = (category) => {
-        setSelectedCategory(category);
-    };
+    useEffect(() => {
+        setSelectedCategory(null);
+        setSelectedType(null);
+    }, []);
 
-    const handleTypeSelected = (type) => {
-        setSelectedType(type);
+    useEffect(() => {
+        return () => {
+            setSelectedCategory(null);
+            setSelectedType(null);
+        };
+    }, []);
+
+    const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
     const saveExercise = async () => {
+        const existingExercises = await getAllExercises();
+
+        if (!exerciseName) {
+            alert('Exercise name cannot be empty');
+            return;
+        }
+
+        if (existingExercises.some(exercise => exercise.name.toLowerCase() === exerciseName.toLowerCase())) {
+            alert('Exercise with provided name already exists');
+            return;
+        }
+
+        if (!selectedCategory) {
+            alert('Category must be selected');
+            return;
+        }
+        if (!selectedType) {
+            alert('Type must be selected');
+            return;
+        }
+
         const exerciseData = {
             name: exerciseName,
             category: selectedCategory,
@@ -41,9 +72,7 @@ export default function CreateExercise({ navigation }) {
                 />
             </View>
             <View style={styles.button}>
-                <TouchableOpacity style={styles.buttonTouch} onPress={() => navigation.navigate('CategoryList', {
-                    selectedCategory: selectedCategory, onCategorySelected: handleCategorySelected
-                })}>
+                <TouchableOpacity style={styles.buttonTouch} onPress={() => navigation.navigate('CategoryList')}>
                     <Text style={styles.buttonText}>
                         {selectedCategory ? selectedCategory : 'Exercise Category'}
                     </Text>
@@ -51,9 +80,7 @@ export default function CreateExercise({ navigation }) {
                 </TouchableOpacity>
             </View>
             <View style={styles.button}>
-                <TouchableOpacity style={styles.buttonTouch} onPress={() => navigation.navigate('TypeList', {
-                    selectedType: selectedType, onTypeSelected: handleTypeSelected
-                })}>
+                <TouchableOpacity style={styles.buttonTouch} onPress={() => navigation.navigate('TypeList')}>
                     <Text style={styles.buttonText}>
                         {selectedType ? selectedType : 'Exercise Type'}
                     </Text>
@@ -126,88 +153,3 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_700Bold',
     }
 })
-
-/*
-const [typeModal, setTypeModal] = useState(false);
-const [categoryModal, setCategoryModal] = useState(false);
-return (
-    <SafeAreaView style={styles.safeAreaView}>
-        <View style={styles.exerciseNameView}>
-            <TextInput
-                style={styles.textInput}
-                placeholder='Exercise Name'
-                value={exerciseName}
-                onChangeText={text => setExerciseName(text)}
-            />
-        </View>
-        <View style={styles.button}>
-            <TouchableOpacity
-                style={styles.buttonTouch}
-                onPress={() => setCategoryModal(true)}
-            >
-                <Text style={styles.buttonText}>
-                    {selectedCategory ? selectedCategory : 'Exercise Category'}
-                </Text>
-                <RightArrowSVG />
-            </TouchableOpacity>
-            <Modal
-                transparent={true}
-                visible={categoryModal}
-                onRequestClose={() => setCategoryModal(!categoryModal)}
-            >
-                <Pressable
-                    style={styles.modalPressable}
-                    onPress={(event) => event.currentTarget === event.target && setCategoryModal(false)}
-                >
-                    <CategoryList
-                        selectedCategory={selectedCategory}
-                        onCategorySelected={handleCategorySelected}
-                    />
-                </Pressable>
-            </Modal>
-        </View>
-        <View style={styles.button}>
-            <TouchableOpacity
-                style={styles.buttonTouch}
-                onPress={() => setTypeModal(true)}>
-                <Text style={styles.buttonText}>
-                    {selectedType ? selectedType : 'Exercise Type'}
-                </Text>
-                <RightArrowSVG />
-            </TouchableOpacity>
-            <Modal
-                transparent={true}
-                visible={typeModal}
-                onRequestClose={() => setTypeModal(!typeModal)}
-            >
-                <Pressable
-                    style={styles.modalPressable}
-                    onPress={(event) => event.currentTarget === event.target && setTypeModal(false)}
-                >
-                    <TypeList
-                        selectedType={selectedType}
-                        onTypeSelected={handleTypeSelected}
-                    />
-                </Pressable>
-            </Modal>
-        </View>
-        <View style={styles.descriptionView}>
-            <TextInput style={styles.textInput}
-                placeholder='Description'
-                multiline={true}
-                maxLength={100}
-                value={exerciseDescription}
-                onChangeText={text => setExerciseDescription(text)}
-            />
-        </View>
-        <View style={{ marginTop: 10 }}>
-            <TouchableOpacity
-                style={styles.saveButton}
-                onPress={saveExercise}
-            >
-                <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
-        </View>
-    </SafeAreaView >
-)
-*/

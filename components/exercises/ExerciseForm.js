@@ -294,9 +294,8 @@ export default function ExerciseForm() {
         selectedSeriesId.current = null;
     
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-    };
-    
-    
+        await setItem(['history', exerciseName], historySeriesAfterDelete);
+    }
 
     const renderInputsBasedOnType = () => {
         if (type.type1 === 'kg' && type.type2 === 'rep') {

@@ -1,9 +1,10 @@
-import { View, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Text } from '../Text.js';
+import { Text } from '../../Text.js';
+import { useType } from './TypeContext.js';
 
-export default function TypeList({ route, navigation }) {
-    const { onTypeSelected, selectedType } = route?.params;
+export default function TypeList({ navigation }) {
+    const { selectedType, setSelectedType } = useType();
 
     const data = [
         {
@@ -13,10 +14,8 @@ export default function TypeList({ route, navigation }) {
     ];
 
     const handleTypeChange = (type) => {
-        onTypeSelected(type);
-        navigation.goBack({
-            selectedType: type
-        })
+        setSelectedType(type);
+        navigation.goBack();
     };
 
     return (
