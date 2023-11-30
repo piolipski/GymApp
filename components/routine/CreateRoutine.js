@@ -9,16 +9,16 @@ export default function CreateRoutine({ navigation, route }) {
     const [routineName, setRoutineName] = useState('');
     const { checkedExercises, setCheckedExercises } = useRoutine();
 
-    const handleCheckedExercises = (checkedExercises) => {
-        setCheckedExercises(checkedExercises);
-    };
-
     useEffect(() => {
+        if (route.params?.key !== "Create Exercise") {
+            setCheckedExercises([]);
+        }
+
         if (route.params?.routine) {
             setRoutineName(route.params.routine.title);
             setCheckedExercises(route.params.routine.data);
         }
-    }, [route.params?.routine]);
+    }, [route.params]);
 
     const handleSaveRoutine = async () => {
         const existingRoutines = await getAllRoutinesWithNames();
@@ -39,9 +39,9 @@ export default function CreateRoutine({ navigation, route }) {
             return;
         }
 
-        // Save the new routine
         await setItem(['routine', routineName], checkedExercises);
         navigation.goBack();
+        setCheckedExercises([]);
     }
 
     const handleUpdateRoutine = async () => {
@@ -67,11 +67,13 @@ export default function CreateRoutine({ navigation, route }) {
         await setItem(['routine', routineName], checkedExercises);
 
         navigation.goBack();
+        setCheckedExercises([]);
     }
 
     const handleDeleteRoutine = async () => {
         await deleteItem(['routine', routineName]);
         navigation.goBack();
+        setCheckedExercises([]);
     }
 
     return (
@@ -114,7 +116,6 @@ export default function CreateRoutine({ navigation, route }) {
                 }]}
                     onPress={() => navigation.navigate('Exercises', {
                         isRoutine: true,
-                        onCheckedExercisesChange: handleCheckedExercises,
                         checkedExercises: checkedExercises
                     })}>
                     <Text style={[{

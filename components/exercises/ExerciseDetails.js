@@ -1,7 +1,7 @@
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from '../Text.js';
 import { useNavigation } from '@react-navigation/native';
-import { deleteItem } from '../database/DataStorage.js';
+import { deleteItem, getAllWorkoutsWithDates } from '../database/DataStorage.js';
 
 export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
     const navigation = useNavigation();
@@ -12,6 +12,18 @@ export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
     }
 
     const deleteExercise = async () => {
+        const existingWorkouts = await getAllWorkoutsWithDates();
+
+        const isExerciseInWorkouts = existingWorkouts.some(workout => {
+            const workoutExercises = Object.values(workout)[0];
+            return Object.keys(workoutExercises).includes(exercise.name);
+        });
+        
+        if (isExerciseInWorkouts) {
+            alert('Exercise is already in use and cannot be deleted');
+            return;
+        }
+        
         setDetailModalOpen(false);
         await deleteItem(['exercise', exercise.name]);
     }

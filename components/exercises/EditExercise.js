@@ -4,8 +4,7 @@ import RightArrowSVG from '../../images/RightArrowSVG.svg';
 import { useEffect, useState } from 'react';
 import { useCategory } from './category/CategoryContext.js';
 import { useType } from './type/TypeContext.js';
-import { getAllExercises, setItem, deleteItem, getItem, getAllWorkouts } from '../database/DataStorage.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAllExercises, getAllRoutinesWithNames, getAllWorkoutsWithDates, setItem, deleteItem } from '../database/DataStorage.js';
 
 export default function EditExercise({ route, navigation }) {
     const exercise = route.params.exercise;
@@ -20,14 +19,17 @@ export default function EditExercise({ route, navigation }) {
         setSelectedType(exercise.type);
     }, []);
 
-    const capitalizeFirstLetter = (string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
     const editExercise = async () => {
         const existingExercises = await getAllExercises();
+        const existingRoutines = await getAllRoutinesWithNames();
+        const existingWorkouts = await getAllWorkoutsWithDates();
+
+        console.log(JSON.stringify(existingWorkouts));
 
         const originalName = exercise.name;
+
+        console.log('');
+        console.log("[EW]", JSON.stringify(existingWorkouts));
 
         if (!exerciseName) {
             alert('Exercise name cannot be empty');
@@ -51,42 +53,35 @@ export default function EditExercise({ route, navigation }) {
             description: exerciseDescription
         };
 
-        //await deleteItem(['exercise', originalName]);
-        //await setItem(['exercise', exerciseName], updatedExercise);
-        /*
-        const workoutHistory = await getItem(['history', exercise.name]);
-        console.log('--------------------START FROM HERE--------------------');
-        console.log('');
-        console.log("[WORKOUT HISTORY]", workoutHistory);
-        if (workoutHistory) {
-            const dates = Object.keys(workoutHistory);
-            console.log("[DATES]", dates);
-        }
+        const routinePromises = existingRoutines.map(async (routine) => {
+            const routineName = Object.keys(routine)[0];
+            const exercises = routine[routineName];
 
-        const allWorkouts = await getAllWorkouts();
-        console.log('');
-        console.log("[ALL WORKOUTS]", allWorkouts);
-        if (allWorkouts) {
-            const updatedWorkouts = await Promise.all(allWorkouts.map(async (workout, index) => {
-                const keys = Object.keys(workout);
-                if (workout[originalName]) {
-                    console.log('INDEX: ', index);
-                    console.log('KEY: ', keys);
-                    console.log("[Workout[ON]]", workout[originalName]);
-                    console.log("[AllWorkouts[ON]", allWorkouts[index][originalName]);
-                    let updatedWorkout = { ...workout };
-                    updatedWorkout[exerciseName] = updatedWorkout[originalName];
-                    delete updatedWorkout[originalName];
-                    console.log("[AllWorkouts[EN]", updatedWorkout[exerciseName]);
-                    return updatedWorkout;
-                } else {
-                    return workout;
-                }
-            }));
-            console.log("[UPDATED WORKOUTS]", updatedWorkouts);
-        }
-        */
-        //navigation.navigate('Exercises');
+            const updatedExercises = exercises.map(exercise =>
+                exercise.name === originalName ? updatedExercise : exercise
+            );
+
+            await setItem(['routine', routineName], updatedExercises);
+        });
+
+        const workoutPromises = existingWorkouts.map(async (workout) => {
+            const workoutDate = Object.keys(workout)[0];
+            const exercises = workout[workoutDate];
+
+            const updatedExercises = Object.keys(exercises).reduce((result, exerciseName) => {
+                result[exerciseName === originalName ? updatedExercise.name : exerciseName] = exercises[exerciseName];
+                return result;
+            }, {});
+
+            await setItem(['workout', workoutDate], updatedExercises);
+        });
+
+        await Promise.all([...routinePromises, ...workoutPromises]).then(async () => {
+            await deleteItem(['exercise', originalName]);
+            await setItem(['exercise', exerciseName], updatedExercise);
+
+            navigation.navigate('Exercises');
+        });
     }
 
     return (
