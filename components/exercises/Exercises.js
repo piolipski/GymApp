@@ -10,6 +10,7 @@ import Accordion from '../Accordion.js';
 import EditCategory from './category/EditCategory.js';
 import { useCategoryActions } from './category/CategoryActions.js';
 import ExerciseDetails from './ExerciseDetails.js';
+import { useRoutine } from '../routine/RoutineContext.js';
 
 export default Exercises = ({ route, navigation }) => {
     const isRoutine = route.params?.isRoutine ?? false;
@@ -24,9 +25,8 @@ export default Exercises = ({ route, navigation }) => {
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const { selectedCategoryIndex, handleEditCategory, handleDeleteCategory, setSelectedCategoryIndex } = useCategoryActions();
 
+    const { checkedExercises, setCheckedExercises } = useRoutine();
     const [selectedExercise, setSelectedExercise] = useState(null);
-
-    const [checkedExercises, setCheckedExercises] = useState(route.params?.selectedExercises || []);
 
     const handleCheckboxPress = (exercise) => {
         if (checkedExercises.some((ex) => ex.name === exercise.name)) {
@@ -35,10 +35,6 @@ export default Exercises = ({ route, navigation }) => {
             setCheckedExercises([...checkedExercises, exercise]);
         }
     };
-
-    useEffect(() => {
-        console.log(checkedExercises);
-    }, [checkedExercises]);
 
     useEffect(() => {
         if (route.params?.onCheckedExercisesChange) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { ScrollView, SafeAreaView } from 'react-native';
 import { format } from 'date-fns';
 import { useDate } from '../date/DateContext';
 import { getAllRoutinesWithNames, setItem } from '../database/DataStorage.js';
@@ -44,7 +44,7 @@ export default function Routines({ navigation }) {
     }, [isFocused]);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={[{ flex: 1 }]}>
             <ScrollView>
                 {routines.map((routine, index) => (
                     <RoutineAccordion

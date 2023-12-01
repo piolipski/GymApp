@@ -6,39 +6,65 @@ export default RoutineAccordion = ({ title, data, onLongPress, onSelect }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <View>
+        <View style={[{
+            margin: 10,
+
+        }]}>
             <View style={[{
-                flex: 1,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 backgroundColor: 'white',
+                borderWidth: 0.5,
+                borderColor: 'hsla(0, 0%, 0%, 0.35)',
+                borderRadius: 5,
+            },
+            isOpen && {
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
             }]}>
                 <TouchableOpacity
-                    style={[{ flex: 1 }]}
+                    style={[{ flex: 1, borderRadius: 5, }]}
                     onPress={() => setIsOpen(!isOpen)}
                     onLongPress={onLongPress}>
                     <Text style={[{
-                        padding: 10,
-                        fontWeight: 'bold',
+                        padding: 20,
+                        fontFamily: 'Inter_700Bold',
                         fontSize: 16,
                     }]}>
                         {title}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onSelect}>
-                    <Text style={[{ color: '#006EE6', padding: 10 }]}>Select</Text>
+                    <Text style={[{
+                        color: '#006EE6',
+                        padding: 20,
+                        fontFamily: 'Inter_700Bold',
+                    }]}>Select</Text>
                 </TouchableOpacity>
             </View>
-            {isOpen && data.map((item, index) => (
-                <View key={index} style={[{
-                    padding: 10,
-                    borderBottomWidth: 1,
-                    borderBottomColor: '#eee',
+            <View style={[
+                {
+                    backgroundColor: 'lightgray',
+                },
+                isOpen && {
+                    borderLeftWidth: 0.5,
+                    borderBottomWidth: 0.5,
+                    borderRightWidth: 0.5,
+                    borderBottomLeftRadius: 5,
+                    borderBottomRightRadius: 5,
+                    borderColor: 'hsla(0, 0%, 0%, 0.35)',
                 }]}>
-                    <Text>{item.name}</Text>
-                </View>
-            ))}
+                {isOpen && data.map((item, index) => (
+                    <View key={index} style={[{
+                        padding: 10,
+                    }]}>
+                        <Text style={[{
+                            
+                        }]}>{item.name}</Text>
+                    </View>
+                ))}
+            </View>
         </View>
     );
 };
