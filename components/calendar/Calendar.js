@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, StatusBar, SafeAreaView, ScrollView } from 'react-native';
 import { Text } from '../Text.js';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { format, startOfYear, addMonths, eachMonthOfInterval, startOfMonth, getWeeksInMonth, startOfWeek, isSameMonth, addDays, addYears, subYears, parseISO } from 'date-fns';
+import { format, startOfYear, addMonths, eachMonthOfInterval, startOfMonth, getWeeksInMonth, startOfWeek, isSameMonth, addDays, addYears, subYears } from 'date-fns';
 import LeftArrowSVG from '../../images/LeftArrowSVG.svg';
 import RightArrowSVG from '../../images/RightArrowSVG.svg';
 import { useDate } from '../date/DateContext.js';
 
-import { getAllExercises, getAllWorkouts, getAllWorkoutsWithDates, getItem } from '../database/DataStorage.js';
+import { getAllExercises, getAllWorkoutsWithDates } from '../database/DataStorage.js';
 
 
 const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
@@ -17,7 +17,6 @@ export default function Calendar() {
     const isFocused = useIsFocused();
     const date = useDate();
     const navigation = useNavigation();
-    const testCategories = [];
     const [doneCategories, setDoneCategories] = useState({});
 
     const [selectedYear, setSelectedYear] = useState(new Date());
@@ -165,7 +164,7 @@ export default function Calendar() {
                     <RightArrowSVG height={13} width={13} />
                 </TouchableOpacity>
             </View>
-            <View style={{ flex: 1, paddingTop: StatusBar.currentHeight, }}>
+            <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
                 <ScrollView>
                     <View style={styles.calendarContainer}>
                         {monthsOfYear.map((month, index) => (
