@@ -34,6 +34,7 @@ export default function Calendar() {
     const handleDaySelect = (selectedDate) => {
         const [day, month, year] = selectedDate.split('-');
         const parsedDate = new Date(year, month - 1, day);
+        console.log(parsedDate);
         date.setCurrentDate(parsedDate);
         navigation.navigate('WorkoutLog');
     }
@@ -142,7 +143,6 @@ export default function Calendar() {
                 }
                 
             }))
-            console.log(categoryObject);
             setDoneCategories(categoryObject);
         }
 

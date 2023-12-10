@@ -9,7 +9,7 @@ export default function TypeList({ navigation }) {
     const data = [
         {
             key: "type",
-            values: ["kg - rep", "time - km", "kg - km"]
+            values: ["weight - reps", "time - distance", "weight - distance"]
         }
     ];
 

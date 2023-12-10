@@ -10,7 +10,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import CalendarSVG from '../../images/CalendarSVG.svg';
 import WorkoutLogSVG from "../../images/WorkoutLogSVG.svg";
 
-
 const paddingTop = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 export default function ExerciseForm() {
 
@@ -29,6 +28,8 @@ export default function ExerciseForm() {
     const [exerciseData, setExerciseData] = useState(null);
     const [exerciseHistoryData, setExerciseHistoryData] = useState([]);
     const [series, setSeries] = useState([]);
+    const [typeOfWeigt, setTypeOfWeigt] = useState('');
+    const [typeOfDistance, setTypeOfDistance] = useState('');
     const [type, setType] = useState({
         type1: null,
         type2: null,
@@ -90,13 +91,20 @@ export default function ExerciseForm() {
 
     }
 
-    const onDistaneChange = (text) => {
-        let value = text.replace(/[\-\s]/, '');
-        if (value.trim() === '' || value < 0) {
-            value = '0'
+    const onDistanceChange = (text) => {
+        let value = text.replace(/[\-\s]/g, '');
+
+        if (value.trim() === '' || isNaN(value)) {
+            value = '0';
+        } else {
+            value = parseInt(value, 10).toString();
         }
-        setTypeValue((prevValue) => ({ ...prevValue, type2: value }));
-    }
+
+        setTypeValue((prevValue) => ({
+            ...prevValue,
+            type2: value,
+        }));
+    };
 
     const onTimeChange = (value, type) => {
         if (value.trim() === '' || parseInt(value) < 0) {
@@ -122,11 +130,10 @@ export default function ExerciseForm() {
         }
 
         if (type.type1 === 'time') {
-            let timeInMinutes = parseInt(timeValues.hours) * 60 + parseInt(timeValues.minutes) + parseInt(timeValues.seconds) / 60;
+            let timeInSeconds = parseInt(timeValues.hours) * 3600 + parseInt(timeValues.minutes) * 60 + parseInt(timeValues.seconds);
             singleSeries = {
                 ...singleSeries,
-                [type.type1]: timeInMinutes.toString(),
-
+                [type.type1]: timeInSeconds.toString(),
             }
         }
 
@@ -160,6 +167,7 @@ export default function ExerciseForm() {
     }
 
     const handleEditMode = (id) => {
+        console.log(series);
         const seriesToEdit = series.find((element) => element.id === id);
         if (id === selectedSeriesId.current && editMode === true) {
             setEditMode(false);
@@ -259,46 +267,58 @@ export default function ExerciseForm() {
         const seriesAfterDelete = series.filter((element) => {
             return element.id !== selectedSeriesId.current;
         });
-    
+
         const historySeriesAfterDelete = {
             ...exerciseHistoryData,
             [format(chosenDate.currentDate, 'dd-MM-yyyy')]: seriesAfterDelete,
         };
-    
+
         const updatedThisWorkoutData = {
             ...exerciseData,
             [exerciseName]: {
                 series: seriesAfterDelete,
             },
         };
-    
+
         let existingCategories = await getItem(['calendar', 'category']);
         existingCategories = existingCategories || {};
-    
+
         const currentDateKey = format(chosenDate.currentDate, 'dd-MM-yyyy');
         const currentCategories = existingCategories[currentDateKey] || [];
-    
+
         let updatedCategoriesData = { ...existingCategories };
-    
+
         if (seriesAfterDelete.length === 0) {
             updatedCategoriesData[currentDateKey] = currentCategories.filter(
                 (value) => value !== category.current?.toLowerCase()
             );
-    
+
             delete updatedThisWorkoutData[exerciseName];
         }
-    
+
         setSeries(seriesAfterDelete);
         setExerciseHistoryData(historySeriesAfterDelete);
         setEditMode(false);
         selectedSeriesId.current = null;
-    
+
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
         await setItem(['history', exerciseName], historySeriesAfterDelete);
+    };
+
+    function renderTime(totalSeconds) {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
     }
 
     const renderInputsBasedOnType = () => {
-        if (type.type1 === 'kg' && type.type2 === 'rep') {
+        if (type.type1 === 'weight' && type.type2 === 'reps') {
             return (
                 <>
                     <View style={styles.typeContainer}>
@@ -317,7 +337,7 @@ export default function ExerciseForm() {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.typeTextContainer}>
-                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type1}</Text>
+                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{typeOfWeigt}</Text>
                     </View>
                     <View style={styles.typeContainer}>
                         <TouchableOpacity style={styles.incrementReduceButtonContainer} onPress={handleMinusSecondTypeButton}>
@@ -339,7 +359,7 @@ export default function ExerciseForm() {
                     </View>
                 </>
             );
-        } else if (type.type1 === 'time' && type.type2 === 'km') {
+        } else if (type.type1 === 'time' && type.type2 === 'distance') {
             return (
                 <>
                     <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
@@ -377,18 +397,18 @@ export default function ExerciseForm() {
                     <View style={{ justifyContent: 'center', alignItems: 'center', }}>
                         <TextInput
                             style={styles.inputTimeContainer}
-                            onChangeText={onDistaneChange}
+                            onChangeText={onDistanceChange}
                             value={typeValue.type2}
                             keyboardType='numeric'
                             maxLength={5}
                         />
                     </View>
                     <View style={styles.typeTextContainer}>
-                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type2}</Text>
+                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{typeOfDistance}</Text>
                     </View>
                 </>
             );
-        } else if (type.type1 === 'kg' && type.type2 === 'km') {
+        } else if (type.type1 === 'weight' && type.type2 === 'distance') {
             return (
                 <>
                     <View style={styles.typeContainer}>
@@ -407,19 +427,19 @@ export default function ExerciseForm() {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.typeTextContainer}>
-                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type1}</Text>
+                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{typeOfWeigt}</Text>
                     </View>
                     <View style={{ justifyContent: 'center', alignItems: 'center', }}>
                         <TextInput
                             style={styles.inputTimeContainer}
-                            onChangeText={onDistaneChange}
+                            onChangeText={onDistanceChange}
                             value={typeValue.type2}
                             keyboardType='numeric'
                             maxLength={4}
                         />
                     </View>
                     <View style={styles.typeTextContainer}>
-                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{type.type2}</Text>
+                        <Text style={{ fontSize: 15, color: 'hsla(0,0%,0%, 0.75)' }}>{typeOfDistance}</Text>
                     </View>
                 </>
             );
@@ -435,9 +455,11 @@ export default function ExerciseForm() {
             const fetchedExerciseData = await getItem(['exercise', exerciseName]);
             const fetchedWorkoutData = await getItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')]);
             const fetchedHistoryData = await getItem(['history', exerciseName]);
+            const fetchedTypeOfWeight = await getItem(['key','weight']);
+            const fetchedTypeOfDistance = await getItem(['key','distance']);
+
             const fetchedType = fetchedExerciseData.type.split(' - ');
             const existingExercise = fetchedWorkoutData?.[exerciseName]?.series;
-
             if (fetchedHistoryData) {
                 const sortedData = Object.entries(fetchedHistoryData)
                     .sort((a, b) => new Date(b[0]) - new Date(a[0]))
@@ -447,10 +469,11 @@ export default function ExerciseForm() {
                     }, {});
                 setExerciseHistoryData(sortedData ?? []);
             }
-            category.current = fetchedExerciseData?.['category']
+            category.current = fetchedExerciseData?.['category'];
             setSeries(existingExercise ?? []);
             setExerciseData(fetchedWorkoutData ?? null);
-
+            setTypeOfWeigt(fetchedTypeOfWeight);
+            setTypeOfDistance(fetchedTypeOfDistance);
             setType({ type1: fetchedType[0], type2: fetchedType[1] })
         }
 
@@ -513,11 +536,18 @@ export default function ExerciseForm() {
                                     <Text style={[styles.seriesText, { paddingLeft: 30 }]}>{`${index + 1}`}</Text>
                                     {type.type1 === 'time' ? (
                                         <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                            {`${element[type.type2]} ${type.type2}  ${parseFloat(element[type.type1]) < 1 ? element[type.type1] * 60 + ' seconds' : element[type.type1] + ' min'
-                                                }`}
+                                            {`${element[type.type2]} ${typeOfDistance}  ${renderTime(element[type.type1])}`}
                                         </Text>
                                     ) : (
-                                        <Text style={[styles.seriesText, { paddingRight: 30 }]}>{`${element[type.type1]} ${type.type1} x ${element[type.type2]} ${type.type2}`}</Text>
+                                        type.type1 === 'weight' && type.type2 === 'reps' ? (
+                                            <Text style={[styles.seriesText, { paddingRight: 30 }]}>
+                                                {`${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${type.type2}`}
+                                            </Text>
+                                        ) : (
+                                            <Text style={[styles.seriesText, { paddingRight: 30 }]}>
+                                                {`${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${typeOfDistance}`}
+                                            </Text>
+                                        )
                                     )}
                                 </TouchableOpacity>
                             ))
@@ -537,11 +567,18 @@ export default function ExerciseForm() {
                                             <Text style={[styles.seriesText, { paddingLeft: 30 }]}>Series {seriesIndex + 1}</Text>
                                             {type.type1 === 'time' ? (
                                                 <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                    {`${series?.[type.type2]} ${type.type2}  ${parseFloat(series?.[type.type1]) < 1 ? series?.[type.type1] * 60 + ' seconds' : series?.[type.type1] + ' min'
-                                                        }`}
+                                                    {`${series[type.type2]} ${type.type2}  ${renderTime(series[type.type1])}`}
                                                 </Text>
                                             ) : (
-                                                <Text style={[styles.seriesText, { paddingRight: 30 }]}>{`${series?.[type.type1]} ${type.type1} x ${series?.[type.type2]} ${type.type2}`}</Text>
+                                                type.type1 === 'weight' ? (
+                                                    <Text style={[styles.seriesText, { paddingRight: 30 }]}>
+                                                        {`${series[type.type1]} ${typeOfWeigt} x ${series[type.type2]} ${type.type2}`}
+                                                    </Text>
+                                                ) : (
+                                                    <Text style={[styles.seriesText, { paddingRight: 30 }]}>
+                                                        {`${series[type.type1]} ${type.type1} x ${series[type.type2]} ${type.type2}`}
+                                                    </Text>
+                                                )
                                             )}
                                         </View>
                                     ))}

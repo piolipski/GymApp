@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { View, TextInput, Button, StyleSheet,Alert } from 'react-native';
 import { Text } from '../../Text.js';
 import { useNavigation } from '@react-navigation/native';
 
@@ -9,9 +9,38 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSignUp = () => {
-        // Implement your sign-up logic here
-        console.log('Sign Up:', email, password);
+    const [error, setError] = useState('');
+
+    const validateEmail = (stringEmail) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(stringEmail);
+    };
+
+    const handleSignUp = async () => {
+        if(password.trim() === '' || email.trim() === '' || !validateEmail(email)){
+            setError('Please enter valid email and password');
+            return;
+        }
+        try {
+            const response = await fetch('http://10.0.2.2:3000/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email, password: password }),
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (response.ok) {
+                Alert.alert('Registered successfully!');
+                setError('');
+              } else if (data.statusCode === 400) {
+                setError("Account with this email is already registered")
+              }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     return (
@@ -30,6 +59,7 @@ export default function Register() {
                 value={password}
                 secureTextEntry
             />
+            {error.length > 1 ? (<Text style={{fontSize:16, color:'red', padding: 5}}>{error}</Text>) : (<></>)}
             <Button title="Sign Up" onPress={handleSignUp} />
             <Text style={styles.loginText} onPress={() => navigation.navigate('Login')}>
                 Already have an account? Log in

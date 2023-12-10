@@ -18,8 +18,9 @@ export default function WorkoutLog({ navigation }) {
   const isFocused = useIsFocused();
   const date = useDate();
 
-  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState({})
-
+  const [selectedDayExerciseData, setSelectedDayExerciseData] = useState({});
+  const [typeOfWeigt, setTypeOfWeigt] = useState('');
+  const [typeOfDistance, setTypeOfDistance] = useState('');
 
   const handleStartNewWorkoutButton = () => {
     navigation.navigate('ExercisesTab');
@@ -33,14 +34,35 @@ export default function WorkoutLog({ navigation }) {
     navigation.navigate('RoutinesTab');
   }
 
+  function renderTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  }
+
   const renderSeries = (data) => {
     return Object.keys(data).map((key) => {
       const seriesList = data[key].series.map((seriesItem, index) => {
         const seriesData = Object.entries(seriesItem)
           .filter(([attribute]) => attribute !== 'id')
-          .map(([attribute, value]) => (
-            <Text key={attribute} style={{ textAlign: 'center' }}>{`${value}: ${attribute}`}</Text>
-          ));
+          .map(([attribute, value]) => {
+            if (attribute === 'time') {
+              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${renderTime(value)}`}</Text>
+            } else if (attribute === 'weight') {
+              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${typeOfWeigt}`}</Text>
+            } else if (attribute === 'distance') {
+              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${typeOfDistance}`}</Text>
+            } else {
+              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${attribute}`}</Text>
+            }
+
+          });
 
         return (
           <View key={index} style={{
@@ -91,7 +113,11 @@ export default function WorkoutLog({ navigation }) {
 
     const fetchExercise = async () => {
       const fetchedTodayWorkoutData = await getItem(['workout', format(date.currentDate, 'dd-MM-yyyy')]) ?? {};
+      const fetchedTypeOfWeight = await getItem(['key', 'weight']);
+      const fetchedTypeOfDistance = await getItem(['key', 'distance']);
       setSelectedDayExerciseData(fetchedTodayWorkoutData);
+      setTypeOfWeigt(fetchedTypeOfWeight);
+      setTypeOfDistance(fetchedTypeOfDistance);
     }
 
     if (isFocused) {
