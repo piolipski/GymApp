@@ -1,13 +1,8 @@
 import {
     View,
-    ScrollView,
     TouchableOpacity,
     StyleSheet,
-    StatusBar,
-    Platform,
     SafeAreaView,
-    Modal,
-    Pressable,
     Alert
 } from 'react-native';
 import React, { useEffect, useState } from 'react';

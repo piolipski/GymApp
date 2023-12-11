@@ -107,10 +107,11 @@ export default function ExerciseForm() {
     };
 
     const onTimeChange = (value, type) => {
-        if (value.trim() === '' || parseInt(value) < 0) {
-            value = '0';
+        let valueValidated = value.replace(/\D/g, '');
+        if (valueValidated.trim() === '' || parseInt(valueValidated) < 0) {
+            valueValidated = '0';
         }
-        setTimeValues((prevValues) => ({ ...prevValues, [type]: value }));
+        setTimeValues((prevValues) => ({ ...prevValues, [type]: valueValidated }));
     };
 
     const onSecondTypeChange = (text) => {
@@ -529,7 +530,7 @@ export default function ExerciseForm() {
                                     {type.type1 === 'time' ? (
                                         <Text style={[styles.seriesText, { paddingRight: 30 }]}>
                                             {typeOfDistance === 'km' ? (
-                                                `${element[type.type1]} ${typeOfDistance} x ${element[type.type2]} ${type.type2}`
+                                                `${element[type.type2]} ${typeOfDistance} ${renderTime(element[type.type1])} `
                                             ) : (
                                                 `${(Number((element[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance} ${renderTime(element[type.type1])}`
                                             )}
@@ -572,7 +573,7 @@ export default function ExerciseForm() {
                                             {type.type1 === 'time' ? (
                                                 <Text style={[styles.seriesText, { paddingRight: 30 }]}>
                                                     {typeOfDistance === 'km' ? (
-                                                        `${series[type.type1]} ${typeOfDistance} x ${series[type.type2]} ${type.type2}`
+                                                        `${series[type.type2]} ${typeOfDistance} ${renderTime(series[type.type1])}`
                                                     ) : (
                                                         `${(Number((series[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance} ${renderTime(series[type.type1])}`
                                                     )}
