@@ -284,12 +284,16 @@ export default function ExerciseForm() {
             Object.entries(historySeriesAfterDelete).filter(([key, value]) => value.length > 0)
         );
 
+        const filteredThisWorkoutData = Object.fromEntries(
+            Object.entries(updatedThisWorkoutData).filter(([key, value]) => value.series && value.series.length > 0)
+        );
+
         setSeries(seriesAfterDelete);
         setExerciseHistoryData(filteredHistorySeries);
         setEditMode(false);
         selectedSeriesId.current = null;
 
-        await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
+        await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], filteredThisWorkoutData);
         await setItem(['history', exerciseName], filteredHistorySeries);
     };
 
@@ -318,7 +322,7 @@ export default function ExerciseForm() {
                             onChangeText={onFirstTypeChange}
                             value={typeValue.type1}
                             keyboardType='numeric'
-                            maxLength={4}
+                            maxLength={5}
                         />
                         <TouchableOpacity style={styles.incrementReduceButtonContainer} onPress={handlePlusFirstTypeButton}>
                             <Text style={{ fontSize: 35, textAlign: 'center', lineHeight: 40 }}> + </Text>
@@ -408,7 +412,7 @@ export default function ExerciseForm() {
                             onChangeText={onFirstTypeChange}
                             value={typeValue.type1}
                             keyboardType='numeric'
-                            maxLength={4}
+                            maxLength={5}
                         />
                         <TouchableOpacity style={styles.incrementReduceButtonContainer} onPress={handlePlusFirstTypeButton}>
                             <Text style={{ fontSize: 35, textAlign: 'center', lineHeight: 40 }}> + </Text>
@@ -541,9 +545,8 @@ export default function ExerciseForm() {
                                             </Text>
                                         ) : (
                                             <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                {`${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${typeOfDistance}`}
                                                 {typeOfDistance === 'km' ? (
-                                                    `${element[type.type1]} ${typeOfDistance} x ${element[type.type2]} ${type.type2}`
+                                                    `${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${typeOfDistance}`
                                                 ) : (
                                                     `${element[type.type1]} ${typeOfDistance} x ${(Number((element[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance}}`
                                                 )}

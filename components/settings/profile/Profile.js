@@ -41,6 +41,10 @@ export default function Profile() {
         navigation.navigate('Change Email');
     }
 
+    const handleDeteleAccountButton = () => {
+        navigation.navigate('Delete Account');
+    }
+
     const parseTrainingLogData = (input, typeOfWeight, typeOfDistance) => {
         const formatDate = (date) => {
             const d = new Date(date);
@@ -179,11 +183,7 @@ export default function Profile() {
                 <AccountSVG height={125} width={125} fill={'#006EE6'} />
             </View>
             <View style={styles.container}>
-                <TouchableOpacity style={styles.profileButton} onPress={handleLoginButton}>
-                    <Text style={styles.profileText}>Login</Text>
-                    <RightArrowSVG height={13} width={13} />
-                </TouchableOpacity>
-                {isLoggedIn && (
+                {isLoggedIn ? (
                     <View>
                         <TouchableOpacity style={styles.profileButton} onPress={handleLogoutButton}>
                             <Text style={styles.profileText}>Logout</Text>
@@ -197,7 +197,16 @@ export default function Profile() {
                             <Text style={styles.profileText}>Change Email</Text>
                             <RightArrowSVG height={13} width={13} />
                         </TouchableOpacity>
+                        <TouchableOpacity style={styles.profileButton} onPress={handleDeteleAccountButton}>
+                            <Text style={styles.profileText}>Delete account</Text>
+                            <RightArrowSVG height={13} width={13} />
+                        </TouchableOpacity>
                     </View>
+                ) : (
+                    <TouchableOpacity style={styles.profileButton} onPress={handleLoginButton}>
+                        <Text style={styles.profileText}>Login</Text>
+                        <RightArrowSVG height={13} width={13} />
+                    </TouchableOpacity>
                 )}
                 {isLoggedIn ? (
                     <View style={styles.dataSyncContainer}>

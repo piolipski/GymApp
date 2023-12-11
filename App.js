@@ -27,6 +27,7 @@ import ExerciseForm from './components/exercises/ExerciseForm.js';
 import CategoryList from './components/exercises/category/CategoryList.js';
 import TypeList from './components/exercises/type/TypeList.js';
 import EditExercise from './components/exercises/EditExercise.js';
+import DeleteAccount from './components/settings/profile/DeleteAccount.js';
 
 import Routines from './components/routine/Routines.js';
 import CreateRoutine from './components/routine/CreateRoutine.js';
@@ -81,6 +82,7 @@ function ProfileWrapper() {
       <Stack.Screen name="Register" component={Register} options={headerOptions} />
       <Stack.Screen name="Change Password" component={ChangePassword} options={headerOptions} />
       <Stack.Screen name="Change Email" component={ChangeEmail} options={headerOptions} />
+      <Stack.Screen name="Delete Account" component={DeleteAccount} options={headerOptions} />
     </Stack.Navigator>
   )
 }
