@@ -10,7 +10,7 @@ export default function Login() {
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState("");
+    const [error, setError] = useState('');
 
     const validateEmail = (stringEmail) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,8 +36,7 @@ export default function Login() {
 
             if (response.ok) {
                 Alert.alert('Logged in successfully!');
-                console.log(data.token);
-                setItem(['token','key'],data.token);
+                setItem(['key','token'],data.token);
                 setError('');
             } else if (data.code === 404) {
                 setError("Wrong email or password");

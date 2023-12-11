@@ -256,7 +256,7 @@ const checkFirstTimeOpening = async () => {
             await setItem(['key', 'autoStart'], false);
             await setItem(['key', 'weight'], 'kg');
             await setItem(['key','distance'],'km');
-            console.log('test', await getItem(['key', 'vibration']), await getItem(['key', 'sound']), await getItem(['key', 'autoStart']))
+            await setItem(['key','token'],'logout');
 
             await setItem(['key', 'isFirstTimeOpened'], true);
         }

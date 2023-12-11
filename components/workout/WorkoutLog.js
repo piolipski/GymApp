@@ -55,9 +55,13 @@ export default function WorkoutLog({ navigation }) {
             if (attribute === 'time') {
               return <Text key={attribute} style={{ textAlign: 'center' }}>{`${renderTime(value)}`}</Text>
             } else if (attribute === 'weight') {
-              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${typeOfWeigt}`}</Text>
+              return <Text key={attribute} style={{ textAlign: 'center' }}>
+                {typeOfWeigt === 'kg' ? (`${value} ${typeOfWeigt}`) : (`${(Number(value * 2.20462262)).toFixed(2)} ${typeOfWeigt}`)}
+              </Text>
             } else if (attribute === 'distance') {
-              return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${typeOfDistance}`}</Text>
+              return <Text key={attribute} style={{ textAlign: 'center' }}>
+                {typeOfDistance === 'km' ? (`${value} ${typeOfDistance}`) : (`${(Number(value * 1.609344)).toFixed(2)} ${typeOfDistance}`)}
+              </Text>
             } else {
               return <Text key={attribute} style={{ textAlign: 'center' }}>{`${value} ${attribute}`}</Text>
             }

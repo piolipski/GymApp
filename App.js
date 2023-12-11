@@ -18,6 +18,9 @@ import Settings from './components/settings/Settings.js';
 
 import Login from './components/settings/profile/Login.js';
 import Register from './components/settings/profile/Register.js'
+import Profile from './components/settings/profile/Profile.js';
+import ChangeEmail from './components/settings/profile/ChangeEmail.js';
+import ChangePassword from './components/settings/profile/ChangePassword.js';
 
 import CreateExercise from './components/exercises/CreateExercise.js';
 import ExerciseForm from './components/exercises/ExerciseForm.js';
@@ -70,12 +73,23 @@ const CalendarIcon = ({ focused, color, size }) => {
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+function ProfileWrapper() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Profile" component={Profile} options={headerOptions} />
+      <Stack.Screen name="Login" component={Login} options={headerOptions} />
+      <Stack.Screen name="Register" component={Register} options={headerOptions} />
+      <Stack.Screen name="Change Password" component={ChangePassword} options={headerOptions} />
+      <Stack.Screen name="Change Email" component={ChangeEmail} options={headerOptions} />
+    </Stack.Navigator>
+  )
+}
+
 function SettingsWrapper() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Settings" component={Settings} options={headerOptions} />
-      <Stack.Screen name="Login" component={Login} options={headerOptions} />
-      <Stack.Screen name="Register" component={Register} options={headerOptions} />
+      <Stack.Screen name="ProfileTab" component={ProfileWrapper} options={{...headerOptions, headerShown: false, title: "Profile"}}/>
     </Stack.Navigator>
   )
 }

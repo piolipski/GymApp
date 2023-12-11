@@ -125,7 +125,7 @@ export default function ExerciseForm() {
 
         let singleSeries = {
             id: new Date().getTime(),
-            [type.type1]: typeValue.type1,
+            [type.type1]: type.type1 === 'weight' ? (typeOfWeigt === 'kg' ? typeValue.type1 : (typeValue.type1 * 0.45359237).toFixed(2)) : typeValue.type1,
             [type.type2]: typeValue.type2
         }
 
@@ -211,7 +211,7 @@ export default function ExerciseForm() {
                 } else {
                     updatedElement = {
                         ...element,
-                        [type.type1]: typeValue.type1,
+                        [type.type1]: type.type1 === 'weight' ? (typeOfWeigt === 'kg' ? typeValue.type1 : (typeValue.type1 * 0.45359237).toFixed(2)) : typeValue.type1,
                         [type.type2]: typeValue.type2,
                     };
                 }
@@ -236,7 +236,7 @@ export default function ExerciseForm() {
                         } else {
                             updatedElement = {
                                 ...element,
-                                [type.type1]: typeValue.type1,
+                                [type.type1]: type.type1 === 'weight' ? (typeOfWeigt === 'kg' ? typeValue.type1 : (typeValue.type1 * 0.45359237).toFixed(2)) : typeValue.type1,
                                 [type.type2]: typeValue.type2,
                             };
                         }
@@ -280,29 +280,17 @@ export default function ExerciseForm() {
             },
         };
 
-        let existingCategories = await getItem(['calendar', 'category']);
-        existingCategories = existingCategories || {};
-
-        const currentDateKey = format(chosenDate.currentDate, 'dd-MM-yyyy');
-        const currentCategories = existingCategories[currentDateKey] || [];
-
-        let updatedCategoriesData = { ...existingCategories };
-
-        if (seriesAfterDelete.length === 0) {
-            updatedCategoriesData[currentDateKey] = currentCategories.filter(
-                (value) => value !== category.current?.toLowerCase()
-            );
-
-            delete updatedThisWorkoutData[exerciseName];
-        }
+        const filteredHistorySeries = Object.fromEntries(
+            Object.entries(historySeriesAfterDelete).filter(([key, value]) => value.length > 0)
+        );
 
         setSeries(seriesAfterDelete);
-        setExerciseHistoryData(historySeriesAfterDelete);
+        setExerciseHistoryData(filteredHistorySeries);
         setEditMode(false);
         selectedSeriesId.current = null;
 
         await setItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')], updatedThisWorkoutData);
-        await setItem(['history', exerciseName], historySeriesAfterDelete);
+        await setItem(['history', exerciseName], filteredHistorySeries);
     };
 
     function renderTime(totalSeconds) {
@@ -455,8 +443,8 @@ export default function ExerciseForm() {
             const fetchedExerciseData = await getItem(['exercise', exerciseName]);
             const fetchedWorkoutData = await getItem(['workout', format(chosenDate.currentDate, 'dd-MM-yyyy')]);
             const fetchedHistoryData = await getItem(['history', exerciseName]);
-            const fetchedTypeOfWeight = await getItem(['key','weight']);
-            const fetchedTypeOfDistance = await getItem(['key','distance']);
+            const fetchedTypeOfWeight = await getItem(['key', 'weight']);
+            const fetchedTypeOfDistance = await getItem(['key', 'distance']);
 
             const fetchedType = fetchedExerciseData.type.split(' - ');
             const existingExercise = fetchedWorkoutData?.[exerciseName]?.series;
@@ -536,16 +524,29 @@ export default function ExerciseForm() {
                                     <Text style={[styles.seriesText, { paddingLeft: 30 }]}>{`${index + 1}`}</Text>
                                     {type.type1 === 'time' ? (
                                         <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                            {`${element[type.type2]} ${typeOfDistance}  ${renderTime(element[type.type1])}`}
+                                            {typeOfDistance === 'km' ? (
+                                                `${element[type.type1]} ${typeOfDistance} x ${element[type.type2]} ${type.type2}`
+                                            ) : (
+                                                `${(Number((element[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance} ${renderTime(element[type.type1])}`
+                                            )}
                                         </Text>
                                     ) : (
                                         type.type1 === 'weight' && type.type2 === 'reps' ? (
                                             <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                {`${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${type.type2}`}
+                                                {typeOfWeigt === 'kg' ? (
+                                                    `${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${type.type2}`
+                                                ) : (
+                                                    `${(Number((element[type.type1]) * 2.20462262)).toFixed(2)} ${typeOfWeigt} x ${element[type.type2]} ${type.type2}`
+                                                )}
                                             </Text>
                                         ) : (
                                             <Text style={[styles.seriesText, { paddingRight: 30 }]}>
                                                 {`${element[type.type1]} ${typeOfWeigt} x ${element[type.type2]} ${typeOfDistance}`}
+                                                {typeOfDistance === 'km' ? (
+                                                    `${element[type.type1]} ${typeOfDistance} x ${element[type.type2]} ${type.type2}`
+                                                ) : (
+                                                    `${element[type.type1]} ${typeOfDistance} x ${(Number((element[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance}}`
+                                                )}
                                             </Text>
                                         )
                                     )}
@@ -567,16 +568,29 @@ export default function ExerciseForm() {
                                             <Text style={[styles.seriesText, { paddingLeft: 30 }]}>Series {seriesIndex + 1}</Text>
                                             {type.type1 === 'time' ? (
                                                 <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                    {`${series[type.type2]} ${type.type2}  ${renderTime(series[type.type1])}`}
+                                                    {typeOfDistance === 'km' ? (
+                                                        `${series[type.type1]} ${typeOfDistance} x ${series[type.type2]} ${type.type2}`
+                                                    ) : (
+                                                        `${(Number((series[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance} ${renderTime(series[type.type1])}`
+                                                    )}
                                                 </Text>
                                             ) : (
-                                                type.type1 === 'weight' ? (
+                                                type.type1 === 'weight' && type.type2 === 'reps' ? (
                                                     <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                        {`${series[type.type1]} ${typeOfWeigt} x ${series[type.type2]} ${type.type2}`}
+                                                        {typeOfWeigt === 'kg' ? (
+                                                            `${series[type.type1]} ${typeOfWeigt} x ${series[type.type2]} ${type.type2}`
+                                                        ) : (
+                                                            `${(Number((series[type.type1]) * 2.20462262)).toFixed(2)} ${typeOfWeigt} x ${series[type.type2]} ${type.type2}`
+                                                        )}
                                                     </Text>
                                                 ) : (
                                                     <Text style={[styles.seriesText, { paddingRight: 30 }]}>
-                                                        {`${series[type.type1]} ${type.type1} x ${series[type.type2]} ${type.type2}`}
+                                                        {`${series[type.type1]} ${typeOfWeigt} x ${series[type.type2]} ${typeOfDistance}`}
+                                                        {typeOfDistance === 'km' ? (
+                                                            `${series[type.type1]} ${typeOfDistance} x ${series[type.type2]} ${type.type2}`
+                                                        ) : (
+                                                            `${series[type.type1]} ${typeOfDistance} x ${(Number((series[type.type2]) * 1.609344)).toFixed(2)} ${typeOfDistance}}`
+                                                        )}
                                                     </Text>
                                                 )
                                             )}
