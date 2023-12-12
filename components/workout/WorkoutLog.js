@@ -3,7 +3,7 @@ import { Text } from '../Text.js';
 import { useIsFocused } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { useDate } from '../date/DateContext.js';
-import { getItem } from '../database/DataStorage.js'
+import { getItem, setItem } from '../database/DataStorage.js'
 import { format } from 'date-fns';
 import NewWorkoutSVG from '../../images/NewWorkoutSVG.svg';
 import StartRoutineSVG from '../../images/StartRoutineSVG.svg';
@@ -96,6 +96,7 @@ export default function WorkoutLog({ navigation }) {
             elevation: 4,
           }}
           onPress={() => handleExerciseOnPress(key)}
+          onLongPress={() => handleLongPress(key)}
         >
           <Text style={{
             fontSize: 20,
@@ -113,12 +114,30 @@ export default function WorkoutLog({ navigation }) {
     });
   };
 
+  const handleLongPress = async (name) => {
+
+    const data = { ...selectedDayExerciseData };
+    if(data[name]){
+      delete data[name];
+      setSelectedDayExerciseData(data);
+      const fetchedHistoryData = await getItem(['history', name]);
+      if(fetchedHistoryData[format(date.currentDate, 'dd-MM-yyyy')]){
+        delete fetchedHistoryData[format(date.currentDate, 'dd-MM-yyyy')];
+        await setItem(['history',name],fetchedHistoryData);
+      }
+      console.log(fetchedHistoryData);
+      await setItem(['workout', format(date.currentDate, 'dd-MM-yyyy')], data);
+    }
+
+  }
+
   useEffect(() => {
 
     const fetchExercise = async () => {
       const fetchedTodayWorkoutData = await getItem(['workout', format(date.currentDate, 'dd-MM-yyyy')]) ?? {};
       const fetchedTypeOfWeight = await getItem(['key', 'weight']);
       const fetchedTypeOfDistance = await getItem(['key', 'distance']);
+      console.log(fetchedTodayWorkoutData);
       setSelectedDayExerciseData(fetchedTodayWorkoutData);
       setTypeOfWeigt(fetchedTypeOfWeight);
       setTypeOfDistance(fetchedTypeOfDistance);
