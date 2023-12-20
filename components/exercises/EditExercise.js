@@ -4,7 +4,7 @@ import RightArrowSVG from '../../images/RightArrowSVG.svg';
 import { useEffect, useState } from 'react';
 import { useCategory } from './category/CategoryContext.js';
 import { useType } from './type/TypeContext.js';
-import { getAllExercises, getAllRoutinesWithNames, getAllWorkoutsWithDates, setItem, deleteItem } from '../database/DataStorage.js';
+import { getAllExercises, getAllRoutinesWithNames, getAllWorkoutsWithDates, setItem, deleteItem, getItem } from '../database/DataStorage.js';
 
 export default function EditExercise({ route, navigation }) {
     const exercise = route.params.exercise;
@@ -20,16 +20,12 @@ export default function EditExercise({ route, navigation }) {
     }, []);
 
     const editExercise = async () => {
+        const originalName = exercise.name;
+
         const existingExercises = await getAllExercises();
         const existingRoutines = await getAllRoutinesWithNames();
         const existingWorkouts = await getAllWorkoutsWithDates();
-
-        console.log(JSON.stringify(existingWorkouts));
-
-        const originalName = exercise.name;
-
-        console.log('');
-        console.log("[EW]", JSON.stringify(existingWorkouts));
+        const exerciseHistory = await getItem(['history', originalName]);
 
         if (!exerciseName) {
             alert('Exercise name cannot be empty');
@@ -79,6 +75,9 @@ export default function EditExercise({ route, navigation }) {
         await Promise.all([...routinePromises, ...workoutPromises]).then(async () => {
             await deleteItem(['exercise', originalName]);
             await setItem(['exercise', exerciseName], updatedExercise);
+
+            await deleteItem(['history', originalName]);
+            await setItem(['history', exerciseName], exerciseHistory);
 
             navigation.navigate('Exercises');
         });
