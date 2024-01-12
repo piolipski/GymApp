@@ -34,6 +34,7 @@ import CreateRoutine from './components/routine/CreateRoutine.js';
 
 import WorkoutLogSVG from './images/WorkoutLogSVG.svg';
 import ExerciseSVG from './images/ExerciseSVG.svg';
+import StartRoutineSVG from './images/StartRoutineSVG.svg';
 import SettingsSVG from './images/SettingsSVG.svg';
 import CalendarTabSVG from './images/CalendarTabSVG.svg';
 import {
@@ -91,7 +92,7 @@ function SettingsWrapper() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Settings" component={Settings} options={headerOptions} />
-      <Stack.Screen name="ProfileTab" component={ProfileWrapper} options={{...headerOptions, headerShown: false, title: "Profile"}}/>
+      <Stack.Screen name="ProfileTab" component={ProfileWrapper} options={{ ...headerOptions, headerShown: false, title: "Profile" }} />
     </Stack.Navigator>
   )
 }
@@ -177,14 +178,23 @@ function RoutinesWrapper() {
 }
 
 function WorkoutsWrapper() {
+  const navigation = useNavigation();
+
   return (
     <Stack.Navigator>
-      <Stack.Screen name="WorkoutLog" component={WorkoutLog} options={{
-        ...headerOptions, title: "Workout Log"
-      }} />
+      <Stack.Screen name="WorkoutLog" component={WorkoutLog} options={({ route }) => ({
+        ...headerOptions, headerRight: () => (
+          route.params?.data && Object.keys(route.params?.data).length > 0 && (
+            <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate('CreateRoutine', { data: route?.params.data })}>
+              <StartRoutineSVG height={22} width={22} />
+            </TouchableOpacity>
+          )
+        )
+      })} />
       <Stack.Screen name="ExerciseForm" component={ExerciseForm} options={({ route }) => ({ ...headerOptions, title: route.params.key1 })} />
       <Stack.Screen name="CalendarView" component={Calendar} options={{ tabBarIcon: CalendarIcon, title: "Calendar" }} />
       <Stack.Screen name="RoutinesTab" component={RoutinesWrapper} options={{ ...headerOptions, headerShown: false }} />
+      <Stack.Screen name="CreateRoutine" component={CreateRoutine} options={{ ...headerOptions, title: 'Create Routine' }} />
     </Stack.Navigator>
   )
 }

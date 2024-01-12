@@ -12,7 +12,7 @@ export default function Routines({ navigation }) {
     const isFocused = useIsFocused();
     const date = useDate();
     const [routines, setRoutines] = useState([]);
-
+    
     const fetchRoutines = async () => {
         const routinesData = await getAllRoutinesWithNames();
         const routines = routinesData.map(routine => ({
@@ -49,21 +49,12 @@ export default function Routines({ navigation }) {
         <SafeAreaView style={[{ flex: 1 }]}>
             {routines.length === 0 ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 5 }}>
-                    <Text style={[{
-                        fontSize: 18,
-                        fontFamily: 'Inter_700Bold',
-                    }]}
+                    <Text style={[{ fontSize: 18, fontFamily: 'Inter_700Bold' }]}
                     >
                         No routines available
                     </Text>
-                    <TouchableOpacity onPress={() => {navigation.navigate('CreateRoutine')}}>
-                        <Text style={
-                            [{
-                                color: '#006EE6',
-                                fontSize: 16,
-                            }]
-
-                        }>
+                    <TouchableOpacity onPress={() => { navigation.navigate('CreateRoutine') }}>
+                        <Text style={[{ color: '#006EE6', fontSize: 16 }]}>
                             Create one
                         </Text>
                     </TouchableOpacity>
