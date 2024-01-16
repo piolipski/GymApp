@@ -6,6 +6,8 @@ import { setItem, getAllRoutinesWithNames, deleteItem } from '../database/DataSt
 import { useRoutine } from './RoutineContext.js';
 
 export default function CreateRoutine({ navigation, route }) {
+    const { data } = route.params;
+
     const [routineName, setRoutineName] = useState('');
     const { checkedExercises, setCheckedExercises } = useRoutine();
 
@@ -17,6 +19,9 @@ export default function CreateRoutine({ navigation, route }) {
         if (route.params?.routine) {
             setRoutineName(route.params.routine.title);
             setCheckedExercises(route.params.routine.data);
+        } else if (data) {
+            const exercises = Object.entries(data).map(([name, details]) => ({ name, ...details }));
+            setCheckedExercises(exercises);
         }
     }, [route.params]);
 

@@ -1,13 +1,10 @@
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from '../Text.js';
-import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { deleteItem, getAllWorkoutsWithDates } from '../database/DataStorage.js';
+import { deleteItem, getAllRoutinesWithNames, getAllWorkoutsWithDates } from '../database/DataStorage.js';
 
 export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
     const navigation = useNavigation();
-    
-    const [numberOfLines, setNumberOfLines] = useState(0);
 
     const handleEditExercise = () => {
         setDetailModalOpen(false);
@@ -16,13 +13,21 @@ export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
 
     const deleteExercise = async () => {
         const existingWorkouts = await getAllWorkoutsWithDates();
+        const existingRoutines = await getAllRoutinesWithNames();
+
+        console.log(existingRoutines);
 
         const isExerciseInWorkouts = existingWorkouts.some(workout => {
             const workoutExercises = Object.values(workout)[0];
             return Object.keys(workoutExercises).includes(exercise.name);
         });
 
-        if (isExerciseInWorkouts) {
+        const isExerciseInRoutines = existingRoutines.some(routine => {
+            const routineExercises = Object.values(routine)[0];
+            return routineExercises.some(exerciseObj => exerciseObj.name === exercise.name);
+        });
+
+        if (isExerciseInWorkouts || isExerciseInRoutines) {
             alert('Exercise is already in use and cannot be deleted');
             return;
         }
@@ -137,10 +142,9 @@ export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
                         width: 280,
                         padding: 20,
                         fontSize: 16,
-                    }]} numberOfLines={numberOfLines}
-                        onLayout={(e) => {
-                            setNumberOfLines({ numberOfLines: e.nativeEvent.layout.height > 16 ? 2 : 1 })
-                        }}>
+                    }]}
+                        numberOfLines={4}
+                    >
                         {exercise.description}
                     </Text>
                 </View>

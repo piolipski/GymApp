@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from '../Text.js';
 
 export default RoutineAccordion = ({ title, data, onLongPress, onSelect }) => {
@@ -43,27 +43,30 @@ export default RoutineAccordion = ({ title, data, onLongPress, onSelect }) => {
                     }]}>Select</Text>
                 </TouchableOpacity>
             </View>
-            <View style={[
-                {
-                    backgroundColor: 'lightgray',
-                },
-                isOpen && {
-                    borderLeftWidth: 0.5,
-                    borderBottomWidth: 0.5,
-                    borderRightWidth: 0.5,
-                    borderBottomLeftRadius: 5,
-                    borderBottomRightRadius: 5,
-                    borderColor: 'hsla(0, 0%, 0%, 0.35)',
-                }]}>
+            <View style={[{
+                backgroundColor: 'lightgray',
+            }, isOpen && {
+                borderLeftWidth: 0.5,
+                borderBottomWidth: 0.5,
+                borderRightWidth: 0.5,
+                borderBottomLeftRadius: 5,
+                borderBottomRightRadius: 5,
+                borderColor: 'hsla(0, 0%, 0%, 0.35)',
+            }]}>
                 {isOpen && data.map((item, index) => (
-                    <View key={index} style={[{
-                        padding: 10,
-                    }]}>
-                        <Text style={[{
-                            
-                        }]}>{item.name}</Text>
+                    <View key={index} style={{ padding: 10 }}>
+                        <Text>{item.name}</Text>
                     </View>
                 ))}
+                {isOpen && (
+                    <View style={{ height: 40, borderColor: 'gray', borderTopWidth: 1 }}>
+                        <TextInput
+                            multiline={true}
+                            style={{ padding: 10 }}
+                            placeholder="Add a comment"
+                        />
+                    </View>
+                )}
             </View>
         </View>
     );

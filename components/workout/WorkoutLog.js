@@ -46,6 +46,10 @@ export default function WorkoutLog({ navigation }) {
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   }
 
+  useEffect(() => {
+    navigation.setParams({ data: selectedDayExerciseData })
+  }, [selectedDayExerciseData]);
+
   const renderSeries = (data) => {
     return Object.keys(data).map((key) => {
       const seriesList = data[key].series.map((seriesItem, index) => {
