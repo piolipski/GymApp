@@ -70,17 +70,17 @@ export default function Calendar() {
                                             {dayCategories.slice(0, 4).map((category, index) => {
                                                 let circleColor = 'transparent';
                                                 if (category === 'Chest') {
-                                                    circleColor = 'blue'; 
+                                                    circleColor = 'blue';
                                                 } else if (category === 'Biceps') {
-                                                    circleColor = 'green'; 
+                                                    circleColor = 'green';
                                                 } else if (category === 'Legs') {
-                                                    circleColor = 'purple'; 
+                                                    circleColor = 'purple';
                                                 } else if (category === 'Shoulders') {
-                                                    circleColor = '#ADFF2F'; 
+                                                    circleColor = 'green';
                                                 } else if (category === 'Triceps') {
-                                                    circleColor = 'orange'; 
+                                                    circleColor = 'orange';
                                                 } else {
-                                                    circleColor = '#FF0000'; 
+                                                    circleColor = '#FF0000';
                                                 }
 
                                                 return (
@@ -125,23 +125,23 @@ export default function Calendar() {
             const workouts = await getAllWorkoutsWithDates();
 
             let categoryObject = {}
-            workouts.map((item)=> Object.keys(item).map((date) => {
+            workouts.map((item) => Object.keys(item).map((date) => {
 
                 let categoryArray = [];
                 let exerciseCategory = '';
-                Object.keys(item?.[date]).map((exerciseName) =>{
+                Object.keys(item?.[date]).map((exerciseName) => {
                     const exercise = fetchedExercises.find(item => item.name === exerciseName);
                     exerciseCategory = exercise.category;
                     categoryArray.push(exerciseCategory)
-                    
+
                 })
                 categoryArray = [...new Set(categoryArray)];
                 categoryObject = {
                     ...categoryObject,
                     [date]: categoryArray
-                    
+
                 }
-                
+
             }))
             setDoneCategories(categoryObject);
         }

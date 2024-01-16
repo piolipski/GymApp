@@ -22,7 +22,7 @@ export default function ChangeEmail() {
         try {
             const token = await getItem(['key', 'token']);
             const response = await fetch('http://10.0.2.2:3000/changeEmail', {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,

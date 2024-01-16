@@ -15,7 +15,7 @@ import RightArrowSVG from '../../images/RightArrowSVG.svg';
 import AlarmSVG from '../../images/AlarmSVG.svg';
 import Alarm from '../alarm/Alarm.js';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { getAllExercises, getAllRoutinesWithNames, getItem, setItem, getAllWorkoutsWithDates, synchronizeTrainingLog, synchronizeRoutine, synchronizeExercise, synchronizeHistoryOfExercise, getAllWorkouts } from '../database/DataStorage.js';
+import { getItem, setItem, getAllWorkoutsWithDates, synchronizeTrainingLog, synchronizeRoutine, synchronizeExercise, synchronizeHistoryOfExercise, getAllWorkouts } from '../database/DataStorage.js';
 
 export default function Settings() {
 

@@ -11,6 +11,8 @@ import RightArrowSVG from '../../../images/RightArrowSVG.svg';
 import AccountSVG from '../../../images/AccountSVG.svg';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { getAllExercises, getAllRoutinesWithNames, getItem, setItem, getAllWorkoutsWithDates, synchronizeTrainingLog, synchronizeRoutine, synchronizeExercise, synchronizeHistoryOfExercise, getAllWorkouts } from '../../database/DataStorage.js';
+import * as Network from 'expo-network';
+
 
 export default function Profile() {
 
@@ -18,6 +20,10 @@ export default function Profile() {
     const isFocused = useIsFocused();
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const checkInternetConnectivity = async () => {
+        const networkState = await Network.getNetworkStateAsync();
+        return networkState;
+    };
 
     const handleLoginButton = () => {
         navigation.navigate('Login');
@@ -100,25 +106,27 @@ export default function Profile() {
         const trainingLog = await getAllWorkoutsWithDates();
         const exercises = await getAllExercises();
         const routines = await getAllRoutinesWithNames();
+        const networkIsWorking = checkInternetConnectivity();
 
         try {
-            const token = await getItem(['key', 'token']);
-            const response = await fetch('http://10.0.2.2:3000/saveToDatabase', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ trainingLog: trainingLog, exercise: exercises, routine: routines }),
-            });
-            const data = await response.json();
-            console.log(data);
-            console.log(response.ok)
+            if (networkIsWorking) {
+                const token = await getItem(['key', 'token']);
+                const response = await fetch('http://10.0.2.2:3000/saveToDatabase', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ trainingLog: trainingLog, exercise: exercises, routine: routines }),
+                });
 
-            if (response.ok) {
-                Alert.alert('Data exported to server successfully!');
+                if (response.ok) {
+                    Alert.alert('Data exported to server successfully!');
+                } else {
+                    Alert.alert('Something went wrong, try again later!');
+                }
             } else {
-                console.log('oj cos jest nie tak')
+                Alert.alert('Check your network connection!');
             }
         } catch (error) {
             console.error('Error:', error);

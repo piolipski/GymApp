@@ -110,7 +110,7 @@ export const getAllWorkoutsWithDates = async () => {
                 try {
                     const workoutDate = key.split(SEP)[1];
                     const jsonValue = await AsyncStorage.getItem(key);
-                    const valuesWithDate = { [workoutDate]: JSON.parse(jsonValue) }
+                    const valuesWithDate = { [workoutDate]: JSON.parse(jsonValue) };
 
                     values.push(jsonValue != null ? valuesWithDate : null);
                 } catch (error) {
@@ -126,7 +126,7 @@ export const getAllWorkoutsWithDates = async () => {
         console.error('Error retrieving data: ', error);
         return null;
     }
-}
+};
 
 export const getAllRoutinesWithNames = async () => {
     try {

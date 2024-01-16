@@ -34,7 +34,7 @@ export const AlarmContextProvider = ({ children }) => {
       content: {
         title: 'Timer Finished',
         body: 'Your timer has finished!',
-        sound:await getItem(['key', 'sound']),
+        sound: await getItem(['key', 'sound']),
         vibrate: await getItem(['key', 'vibration']),
       },
 
