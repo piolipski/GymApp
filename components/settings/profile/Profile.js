@@ -144,7 +144,6 @@ export default function Profile() {
                 },
             });
             const data = await response.json();
-            console.log(response.ok)
 
             if (response.ok) {
                 Alert.alert('Data downloaded from server successfully!');
@@ -156,7 +155,7 @@ export default function Profile() {
                 await synchronizeRoutine(transformedRoutineData);
                 await synchronizeExercise(transformedExerciseData);
             } else {
-                console.log('oj cos jest nie tak')
+                Alert.alert('Something went wrong try again later!');
             }
         } catch (error) {
             console.error('Error:', error);

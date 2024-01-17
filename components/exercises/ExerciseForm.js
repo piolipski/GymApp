@@ -168,7 +168,6 @@ export default function ExerciseForm() {
     }
 
     const handleEditMode = (id) => {
-        console.log(series);
         const seriesToEdit = series.find((element) => element.id === id);
         if (id === selectedSeriesId.current && editMode === true) {
             setEditMode(false);

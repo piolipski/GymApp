@@ -31,8 +31,6 @@ export default function ChangeEmail() {
             });
             const data = await response.json();
 
-            console.log(data);
-
             if (response.ok) {
                 Alert.alert(data.message);
                 setError('');

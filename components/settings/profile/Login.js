@@ -31,8 +31,6 @@ export default function Login() {
                 body: JSON.stringify({ email: email, password: password }),
             });
             const data = await response.json();
-            console.log(data);
-            console.log(response.ok)
 
             if (response.ok) {
                 Alert.alert('Logged in successfully!');

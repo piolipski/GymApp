@@ -37,8 +37,6 @@ export default function DeleteAccount() {
                             });
                             const data = await response.json();
 
-                            console.log(data);
-
                             if (response.ok) {
                                 await setItem(['key','token'], 'logout');
                                 Alert.alert(data.message);

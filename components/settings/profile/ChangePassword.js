@@ -25,8 +25,6 @@ export default function ChangePassword() {
                     body: JSON.stringify({ newPassword: newPassword, oldPassword: currentPassword }),
                 });
                 const data = await response.json();
-                console.log(data);
-                console.log(response.ok)
 
                 if (response.ok) {
                     Alert.alert('Password changed!');

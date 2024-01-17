@@ -30,7 +30,6 @@ export default function Register() {
                 body: JSON.stringify({ email: email, password: password }),
             });
             const data = await response.json();
-            console.log(data);
 
             if (response.ok) {
                 Alert.alert('Registered successfully!');

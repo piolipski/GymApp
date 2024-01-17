@@ -223,10 +223,7 @@ export const synchronizeHistoryOfExercise = async (data) => {
         for (const key of historyKeys) {
             await AsyncStorage.removeItem(key);
         }
-
-        console.log('start')
         for (const entry of data) {
-            console.log(entry)
             for (const [dateKey, exerciseDetails] of Object.entries(entry)) {
                 for(const [exerciseName, exerciseData] of Object.entries(exerciseDetails)){
                     const series = exerciseData.series || [];

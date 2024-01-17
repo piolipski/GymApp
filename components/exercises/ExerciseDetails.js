@@ -15,8 +15,6 @@ export default function ExerciseDetails({ exercise, setDetailModalOpen }) {
         const existingWorkouts = await getAllWorkoutsWithDates();
         const existingRoutines = await getAllRoutinesWithNames();
 
-        console.log(existingRoutines);
-
         const isExerciseInWorkouts = existingWorkouts.some(workout => {
             const workoutExercises = Object.values(workout)[0];
             return Object.keys(workoutExercises).includes(exercise.name);

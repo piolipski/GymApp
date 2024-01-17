@@ -3,7 +3,7 @@ import { Text } from '../Text.js';
 import { useIsFocused } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { useDate } from '../date/DateContext.js';
-import { getItem } from '../database/DataStorage.js'
+import { getItem, setItem } from '../database/DataStorage.js'
 import { format } from 'date-fns';
 import NewWorkoutSVG from '../../images/NewWorkoutSVG.svg';
 import StartRoutineSVG from '../../images/StartRoutineSVG.svg';
@@ -32,6 +32,26 @@ export default function WorkoutLog({ navigation }) {
 
   const handleRoutineOnPress = () => {
     navigation.navigate('RoutinesTab');
+  }
+
+  const handleDeleteExercisePress = async (name) => {
+    const historyOfExercise = await getItem(['history', name]);
+    const filteredExerciseKeys = Object.keys(selectedDayExerciseData).filter(key => key !== name);
+    const filteredHistoryKeys = Object.keys(historyOfExercise).filter(key => key !== format(date.currentDate, 'dd-MM-yyyy'));
+
+    const filteredExerciseObject = filteredExerciseKeys.reduce((obj, key) => {
+      obj[key] = selectedDayExerciseData[key];
+      return obj;
+    }, {});
+
+    const filteredHistoryObject = filteredHistoryKeys.reduce((obj, key) => {
+      obj[key] = historyOfExercise[key];
+      return obj;
+    }, {});
+
+    setSelectedDayExerciseData(filteredExerciseObject);
+    await setItem(['workout', format(date.currentDate, 'dd-MM-yyyy')], filteredExerciseObject);
+    await setItem(['history', name], filteredHistoryObject);
   }
 
   function renderTime(totalSeconds) {
@@ -100,6 +120,7 @@ export default function WorkoutLog({ navigation }) {
             elevation: 4,
           }}
           onPress={() => handleExerciseOnPress(key)}
+          onLongPress={() => handleDeleteExercisePress(key)}
         >
           <Text style={{
             fontSize: 20,
