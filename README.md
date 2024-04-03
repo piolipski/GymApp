@@ -10,7 +10,7 @@ Technologies used in the development of the application:
 #### User account:
 - Register/login/logout
 - Edit or delete user data
-- Data synchronization
+- [Data synchronization](https://github.com/Baldziutki/GymAppServer)
 
 #### Training log:
 - View/add/edit/delete workouts
